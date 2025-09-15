@@ -839,7 +839,7 @@
                 
                 // Request camera stream
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
-                
+                await discoverCameras();
                 video.srcObject = stream;
                 errorDiv.style.display = 'none';
                 
