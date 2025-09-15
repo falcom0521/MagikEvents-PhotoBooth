@@ -12,14 +12,16 @@
         // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDcgeMu5fPC1UCTBu7hgPYn-Xn6WUbPJoA",
-            authDomain: "magikevents-bb514.firebaseapp.com",
-            projectId: "magikevents-bb514",
-            storageBucket: "magikevents-bb514.firebasestorage.app",
-            messagingSenderId: "492099076261",
-            appId: "1:492099076261:web:dbf80896539d28ece70d4c",
-            measurementId: "G-S21N9W5PCR",
-            databaseURL: "https://magikevents-bb514-default-rtdb.asia-southeast1.firebasedatabase.app"
+  authDomain: "magikevents-bb514.firebaseapp.com",
+  projectId: "magikevents-bb514",
+  storageBucket: "magikevents-bb514.firebasestorage.app",
+  messagingSenderId: "492099076261",
+  appId: "1:492099076261:web:dbf80896539d28ece70d4c",
+  measurementId: "G-S21N9W5PCR",
+            databaseURL: "https://magikevents-bb514-default-rtdb.asia-southeast1.firebasedatabase.app" // Add this line
         };
+
+        
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
@@ -108,52 +110,37 @@
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 8px;
-            max-width: 100%;
+            gap: 10px;
         }
 
         .camera-switch-btn {
-            padding: 10px 18px;
+            padding: 8px 16px;
             background: linear-gradient(135deg, #6c757d, #5a6268);
             color: white;
             border: none;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
             font-size: 0.9rem;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 6px;
-            min-width: 100px;
-            position: relative;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            gap: 5px;
         }
 
         .camera-switch-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
         }
 
         .camera-switch-btn.active {
             background: linear-gradient(135deg, #667eea, #764ba2);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
         }
 
         .camera-switch-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
             transform: none;
-        }
-
-        .camera-info {
-            position: absolute;
-            bottom: -25px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 0.7rem;
-            color: #6c757d;
-            white-space: nowrap;
         }
 
         .shutter-btn {
@@ -227,18 +214,7 @@
             border: 1px solid rgba(220, 53, 69, 0.3);
         }
 
-        .camera-status {
-            background: rgba(102, 126, 234, 0.1);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #667eea;
-        }
-
-        /* Step 2: Controls */
+        /* Step 2: Controls (previously step 3) */
         .controls-section {
             text-align: center;
         }
@@ -374,7 +350,7 @@
             box-shadow: 0 15px 30px rgba(253, 126, 20, 0.3);
         }
 
-        /* Step 3: Final Result */
+        /* Step 3: Final Result (previously step 4) */
         .result-section {
             text-align: center;
         }
@@ -441,6 +417,23 @@
             box-shadow: 0 15px 30px rgba(108, 117, 125, 0.3);
         }
 
+        .gallery-view-btn {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin: 20px 10px;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(23, 162, 184, 0.3);
+        }
+
         #uploadStatus {
             background: rgba(248, 249, 250, 0.9);
             border-radius: 15px;
@@ -478,6 +471,21 @@
             text-align: center;
         }
 
+        .plan-notice {
+            background: rgba(23, 162, 184, 0.1);
+            border: 1px solid rgba(23, 162, 184, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .plan-notice-text {
+            color: #17a2b8;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
         .quality-info {
             background: rgba(40, 167, 69, 0.1);
             border: 1px solid rgba(40, 167, 69, 0.3);
@@ -513,14 +521,14 @@
             }
 
             .camera-switch-container {
-                justify-content: center;
-                gap: 6px;
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
             }
 
             .camera-switch-btn {
-                min-width: 90px;
+                min-width: 120px;
                 font-size: 0.8rem;
-                padding: 8px 14px;
             }
 
             .background-preview-container {
@@ -537,24 +545,6 @@
                 width: 250px;
             }
         }
-
-        /* iPad specific optimizations */
-        @media (min-width: 768px) and (max-width: 1024px) {
-            .camera-switch-container {
-                justify-content: center;
-                gap: 10px;
-            }
-
-            .camera-switch-btn {
-                min-width: 110px;
-                padding: 12px 20px;
-            }
-
-            .camera-video {
-                max-width: 500px;
-                height: 350px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -569,11 +559,6 @@
         <div class="step-section active" id="step1">
             <div class="camera-section">
                 <h2 class="step-title">📷 Capture Your Photo</h2>
-                
-                <div class="camera-status" id="cameraStatus" style="display: none;">
-                    <p>Initializing cameras...</p>
-                </div>
-                
                 <video id="cameraVideo" class="camera-video" autoplay playsinline></video>
                 <canvas id="captureCanvas" style="display: none;"></canvas>
                 
@@ -598,7 +583,7 @@
             </div>
         </div>
 
-        <!-- Step 2: Controls -->
+        <!-- Step 2: Background Controls (previously step 3) -->
         <div class="step-section" id="step2">
             <div class="controls-section">
                 <h2 class="step-title">🎛️ Adjust Your Photo</h2>
@@ -639,7 +624,7 @@
             </div>
         </div>
 
-        <!-- Step 3: Final Result -->
+        <!-- Step 3: Final Result (previously step 4) -->
         <div class="step-section" id="step3">
             <div class="result-section">
                 <h2 class="step-title">🎉 Your Final Image</h2>
@@ -650,11 +635,14 @@
                         ⬅️ Back to Adjust
                     </button>
                     <button class="download-btn" onclick="downloadAndUploadImage()" id="downloadBtn">
-                        ⬇️ Save
+                        ⬇️  Save
                     </button>
                     <button class="new-photo-btn" onclick="startOver()">
                         🆕 Take New Photo
                     </button>
+                    <!-- <button class="gallery-view-btn" onclick="viewGallery()">
+                        🖼️ View Gallery
+                    </button> -->
                 </div>
                 
                 <div id="uploadStatus" style="margin-top: 20px; text-align: center; display: none;">
@@ -682,123 +670,95 @@
         let availableCameras = [];
         let currentCameraIndex = 0;
         
-        // High quality settings
+        // High quality settings with enhanced camera support
         const HIGH_QUALITY_SETTINGS = {
-            finalWidth: 1200,
-            finalHeight: 1800,
-            jpegQuality: 1.0,
-            pngQuality: 1.0,
+            // Use much higher resolution for final output
+            finalWidth: 1200,  // Increased from 160
+            finalHeight: 1800, // Increased from 240 (maintaining 2:3 aspect ratio)
+            // Maximum quality settings
+            jpegQuality: 1.0,  // Maximum JPEG quality (if needed)
+            pngQuality: 1.0,   // Maximum PNG quality
+            // Camera constraints for highest quality
             baseVideoConstraints: {
-                width: { ideal: 1920, min: 1280 },
-                height: { ideal: 1080, min: 720 },
+                width: { ideal: 1920 },     // Request high resolution
+                height: { ideal: 1080 },    // Request high resolution
                 aspectRatio: 16/9
             }
         };
 
-        // Enhanced camera discovery with iPad-specific handling
+        // Initialize camera and load target frame
+        async function initialize() {
+            await loadTargetImage();
+            await discoverCameras();
+            await startCamera();
+        }
+
+        // Discover available cameras on the device
         async function discoverCameras() {
-            const statusEl = document.getElementById('cameraStatus');
-            statusEl.style.display = 'block';
-            statusEl.innerHTML = '<p>🔍 Discovering available cameras...</p>';
-            
             try {
-                // Request permission first
-                const tempStream = await navigator.mediaDevices.getUserMedia({ video: true });
-                tempStream.getTracks().forEach(track => track.stop());
-                
-                // Get all video devices
                 const devices = await navigator.mediaDevices.enumerateDevices();
                 const videoDevices = devices.filter(device => device.kind === 'videoinput');
                 
-                console.log('Raw video devices found:', videoDevices);
-                
-                availableCameras = [];
-                
-                // Enhanced camera detection logic for iPads
-                for (let i = 0; i < videoDevices.length; i++) {
-                    const device = videoDevices[i];
+                availableCameras = videoDevices.map((device, index) => {
+                    // Determine camera type based on label
+                    let type = 'Camera';
+                    let icon = '📷';
+                    
                     const label = device.label.toLowerCase();
                     
-                    let cameraInfo = {
-                        deviceId: device.deviceId,
-                        label: device.label || `Camera ${i + 1}`,
-                        type: 'Unknown',
-                        icon: '📷',
-                        index: i,
-                        capabilities: null
-                    };
-                    
-                    // Test camera capabilities for better classification
-                    try {
-                        const testStream = await navigator.mediaDevices.getUserMedia({
-                            video: { deviceId: { exact: device.deviceId } }
-                        });
-                        const track = testStream.getVideoTracks()[0];
-                        cameraInfo.capabilities = track.getCapabilities();
-                        testStream.getTracks().forEach(t => t.stop());
-                    } catch (e) {
-                        console.log(`Could not get capabilities for camera ${i}:`, e);
-                    }
-                    
-                    // Enhanced camera type detection
-                    if (label.includes('front') || label.includes('user') || label.includes('facetime')) {
-                        cameraInfo.type = 'Front';
-                        cameraInfo.icon = '🤳';
+                    if (label.includes('front') || label.includes('user')) {
+                        type = 'Front';
+                        icon = '🤳';
                     } else if (label.includes('back') || label.includes('rear') || label.includes('environment')) {
-                        cameraInfo.type = 'Back';
-                        cameraInfo.icon = '📸';
+                        type = 'Back';
+                        icon = '📸';
                     } else if (label.includes('wide') || label.includes('ultra')) {
-                        cameraInfo.type = 'Wide';
-                        cameraInfo.icon = '📐';
+                        type = 'Wide';
+                        icon = '📐';
                     } else if (label.includes('telephoto') || label.includes('tele')) {
-                        cameraInfo.type = 'Tele';
-                        cameraInfo.icon = '🔍';
-                    } else if (label.includes('macro')) {
-                        cameraInfo.type = 'Macro';
-                        cameraInfo.icon = '🔬';
-                    } else {
-                        // Fallback logic based on position
-                        if (i === 0) {
-                            cameraInfo.type = 'Main';
-                            cameraInfo.icon = '📸';
-                        } else if (i === 1) {
-                            cameraInfo.type = 'Front';
-                            cameraInfo.icon = '🤳';
-                        } else {
-                            cameraInfo.type = `Cam ${i + 1}`;
-                            cameraInfo.icon = '📷';
-                        }
+                        type = 'Tele';
+                        icon = '🔍';
+                    } else if (index === 0) {
+                        type = 'Default';
+                        icon = '📷';
                     }
                     
-                    availableCameras.push(cameraInfo);
+                    return {
+                        deviceId: device.deviceId,
+                        label: device.label || `Camera ${index + 1}`,
+                        type: type,
+                        icon: icon,
+                        index: index
+                    };
+                });
+
+                // If no specific camera types detected, set defaults
+                if (availableCameras.length > 0 && availableCameras.every(cam => cam.type === 'Camera')) {
+                    availableCameras[0].type = 'Main';
+                    availableCameras[0].icon = '📸';
+                    if (availableCameras.length > 1) {
+                        availableCameras[1].type = 'Front';
+                        availableCameras[1].icon = '🤳';
+                    }
                 }
-                
-                console.log('Processed cameras:', availableCameras);
-                
-                statusEl.innerHTML = `<p>✅ Found ${availableCameras.length} camera(s)</p>`;
-                setTimeout(() => {
-                    statusEl.style.display = 'none';
-                }, 2000);
-                
+
+                console.log('Discovered cameras:', availableCameras);
                 createCameraSwitchButtons();
                 
             } catch (error) {
                 console.error('Error discovering cameras:', error);
-                statusEl.innerHTML = '<p>❌ Camera access denied</p>';
-                
-                // Fallback cameras
-                availableCameras = [
-                    { deviceId: null, label: 'Default Camera', type: 'Default', icon: '📷', index: 0 }
-                ];
+                availableCameras = [{
+                    deviceId: null,
+                    label: 'Default Camera',
+                    type: 'Default',
+                    icon: '📷',
+                    index: 0
+                }];
                 createCameraSwitchButtons();
-                
-                setTimeout(() => {
-                    statusEl.style.display = 'none';
-                }, 3000);
             }
         }
 
-        // Enhanced camera switch buttons with better iPad layout
+        // Create camera switch buttons
         function createCameraSwitchButtons() {
             const container = document.getElementById('cameraSwitchContainer');
             
@@ -812,11 +772,7 @@
             availableCameras.forEach((camera, index) => {
                 const button = document.createElement('button');
                 button.className = 'camera-switch-btn';
-                button.innerHTML = `
-                    <span>${camera.icon}</span>
-                    <span>${camera.type}</span>
-                `;
-                
+                button.innerHTML = `${camera.icon} ${camera.type}`;
                 button.onclick = () => switchCamera(index);
                 
                 if (index === currentCameraIndex) {
@@ -825,52 +781,27 @@
                 
                 container.appendChild(button);
             });
-            
-            container.style.display = 'flex';
         }
 
-        // Enhanced camera switching with better error handling
+        // Switch to a different camera
         async function switchCamera(index) {
             if (index === currentCameraIndex || !availableCameras[index]) return;
             
-            const buttons = document.querySelectorAll('.camera-switch-btn');
+            currentCameraIndex = index;
             
-            // Disable all buttons during switch
-            buttons.forEach(btn => btn.disabled = true);
+            // Update button states
+            document.querySelectorAll('.camera-switch-btn').forEach((btn, i) => {
+                if (i === index) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
             
-            try {
-                currentCameraIndex = index;
-                
-                // Update button states
-                buttons.forEach((btn, i) => {
-                    if (i === index) {
-                        btn.classList.add('active');
-                    } else {
-                        btn.classList.remove('active');
-                    }
-                });
-                
-                await startCamera();
-                
-            } catch (error) {
-                console.error('Camera switch failed:', error);
-                
-                // Show error message
-                const errorDiv = document.getElementById('cameraError');
-                errorDiv.style.display = 'block';
-                errorDiv.textContent = `Failed to switch to ${availableCameras[index].type} camera. ${error.message}`;
-                
-                setTimeout(() => {
-                    errorDiv.style.display = 'none';
-                }, 5000);
-                
-            } finally {
-                // Re-enable buttons
-                buttons.forEach(btn => btn.disabled = false);
-            }
+            // Restart camera with new device
+            await startCamera();
         }
 
-        // Enhanced camera start with better iPad support
         async function startCamera() {
             const video = document.getElementById('cameraVideo');
             const errorDiv = document.getElementById('cameraError');
@@ -887,7 +818,7 @@
                     }
                 };
 
-                // Enhanced device-specific constraints for iPad
+                // Add device-specific constraints
                 if (availableCameras.length > 0 && availableCameras[currentCameraIndex]) {
                     const selectedCamera = availableCameras[currentCameraIndex];
                     
@@ -901,15 +832,8 @@
                             constraints.video.facingMode = 'environment';
                         }
                     }
-                    
-                    // Add iPad-specific optimizations
-                    if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
-                        constraints.video.width = { ideal: 1920, min: 1280 };
-                        constraints.video.height = { ideal: 1080, min: 720 };
-                        constraints.video.frameRate = { ideal: 30, min: 15 };
-                    }
                 } else {
-                    // Default to environment camera for better quality
+                    // Default to back camera
                     constraints.video.facingMode = 'environment';
                 }
                 
@@ -926,29 +850,21 @@
                 const settings = track.getSettings();
                 console.log('Camera started with settings:', settings);
                 
-                // Update camera info display
-                if (availableCameras[currentCameraIndex]) {
-                    const camera = availableCameras[currentCameraIndex];
-                    console.log(`Active camera: ${camera.type} (${settings.width}x${settings.height})`);
-                }
-                
             } catch (error) {
                 console.error('Camera access error:', error);
                 errorDiv.style.display = 'block';
                 
-                let errorMessage = 'Camera access failed. ';
+                let errorMessage = 'Camera access denied. ';
                 
                 if (error.name === 'NotFoundError' || error.name === 'DeviceNotFoundError') {
-                    errorMessage += `Selected ${availableCameras[currentCameraIndex]?.type || 'camera'} not available. `;
+                    errorMessage += 'Selected camera not found. ';
                 } else if (error.name === 'NotAllowedError') {
                     errorMessage += 'Camera permission denied. ';
                 } else if (error.name === 'NotReadableError') {
                     errorMessage += 'Camera is being used by another app. ';
-                } else if (error.name === 'OverconstrainedError') {
-                    errorMessage += 'Camera does not support requested settings. ';
                 }
                 
-                errorMessage += 'Try another camera or use "Choose from Gallery".';
+                errorMessage += 'Please use "Choose from Gallery" option below.';
                 errorDiv.textContent = errorMessage;
             }
         }
@@ -965,13 +881,15 @@
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     
+                    // Use high resolution for the frame
                     canvas.width = HIGH_QUALITY_SETTINGS.finalWidth;
                     canvas.height = HIGH_QUALITY_SETTINGS.finalHeight;
                     
+                    // Draw a high-quality frame with smooth edges
                     ctx.fillStyle = 'rgba(0,0,0,0.3)';
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                     
-                    const frameThickness = Math.floor(canvas.width * 0.08);
+                    const frameThickness = Math.floor(canvas.width * 0.08); // 8% of width
                     const innerWidth = canvas.width - (frameThickness * 2);
                     const innerHeight = canvas.height - (frameThickness * 2);
                     
@@ -981,7 +899,7 @@
                     ctx.strokeRect(frameThickness, frameThickness, innerWidth, innerHeight);
                     
                     targetImage = new Image();
-                    targetImage.src = canvas.toDataURL('image/png');
+                    targetImage.src = canvas.toDataURL('image/png'); // Use PNG for frame
                     resolve();
                 };
                 img.src = './frame.png';
@@ -1009,16 +927,16 @@
             // Draw the video frame to canvas at full resolution
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            // Convert canvas to high-quality PNG
+            // Convert canvas to high-quality PNG (lossless)
             canvas.toBlob(function(blob) {
                 const img = new Image();
                 img.onload = function() {
                     backgroundImage = img;
-                    console.log(`Captured image: ${img.width}x${img.height} from ${availableCameras[currentCameraIndex]?.type || 'camera'}`);
+                    console.log(`Captured image: ${img.width}x${img.height}`);
                     goToStep(2);
                 };
                 img.src = URL.createObjectURL(blob);
-            }, 'image/png');
+            }, 'image/png'); // Use PNG instead of JPEG to avoid compression
         }
 
         function handleFileSelect(event) {
@@ -1039,22 +957,29 @@
         }
 
         function retakePhoto() {
+            // Reset settings
             zoomLevel = 100;
             xPosition = 0;
             yPosition = 0;
             backgroundImage = null;
+            
+            // Go back to camera step
             goToStep(1);
         }
 
         function goToStep(step) {
+            // Hide all steps
             document.querySelectorAll('.step-section').forEach(section => {
                 section.classList.remove('active');
             });
             
+            // Show target step
             document.getElementById(`step${step}`).classList.add('active');
             currentStep = step;
             
+            // Setup step-specific functionality
             if (step === 1) {
+                // Reinitialize camera discovery and start camera
                 setTimeout(async () => {
                     if (availableCameras.length === 0) {
                         await discoverCameras();
@@ -1065,6 +990,7 @@
                 setupBackgroundControls();
             }
             
+            // Stop camera when leaving step 1
             if (step !== 1 && stream) {
                 stream.getTracks().forEach(track => track.stop());
                 stream = null;
@@ -1078,6 +1004,7 @@
             previewImg.src = backgroundImage.src;
             previewImg.style.display = 'block';
             
+            // Keep current control values when coming back from final result
             document.getElementById('zoomSlider').value = zoomLevel;
             document.getElementById('xSlider').value = xPosition;
             document.getElementById('ySlider').value = yPosition;
@@ -1146,14 +1073,17 @@
             const canvas = document.getElementById('compositeCanvas');
             const ctx = canvas.getContext('2d');
             
+            // Use high resolution for final output
             canvas.width = HIGH_QUALITY_SETTINGS.finalWidth;
             canvas.height = HIGH_QUALITY_SETTINGS.finalHeight;
             
+            // Enable high-quality rendering
             ctx.imageSmoothingEnabled = true;
             ctx.imageSmoothingQuality = 'high';
             
             console.log(`Processing at ${canvas.width}x${canvas.height} resolution`);
             
+            // Calculate scaling and positioning for high resolution
             const scaleX = canvas.width / backgroundImage.width;
             const scaleY = canvas.height / backgroundImage.height;
             const baseScale = Math.max(scaleX, scaleY);
@@ -1168,12 +1098,18 @@
             const finalOffsetX = baseOffsetX + (xPosition / 100) * maxOffsetX;
             const finalOffsetY = baseOffsetY + (yPosition / 100) * maxOffsetY;
             
+            // Clear canvas with transparent background
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background image at high quality
             ctx.drawImage(backgroundImage, finalOffsetX, finalOffsetY, scaledWidth, scaledHeight);
+            
+            // Draw target frame/overlay at high quality
             ctx.drawImage(targetImage, 0, 0, canvas.width, canvas.height);
             
+            // Show final result
             const finalResult = document.getElementById('finalResult');
-            finalResult.src = canvas.toDataURL('image/png');
+            finalResult.src = canvas.toDataURL('image/png'); // Use PNG for maximum quality
             finalResult.style.display = 'block';
             
             console.log('Final composite created at maximum quality');
@@ -1187,6 +1123,7 @@
             const uploadMessage = document.getElementById('uploadMessage');
             const uploadProgressBar = document.getElementById('uploadProgressBar');
 
+            // Disable button and show loading
             downloadBtn.disabled = true;
             downloadBtn.textContent = '⏳ Processing...';
             uploadStatus.style.display = 'block';
@@ -1195,6 +1132,7 @@
             uploadProgressBar.style.width = '20%';
 
             try {
+                // Generate timestamp for filename
                 const now = new Date();
                 const timestamp = now.getFullYear() + 
                                 String(now.getMonth() + 1).padStart(2, '0') + 
@@ -1204,8 +1142,11 @@
                                 String(now.getSeconds()).padStart(2, '0');
                 
                 const filename = `magik-events-hq-${timestamp}.png`;
+                
+                // Create high-quality PNG data URL (no compression)
                 const imageDataUrl = canvas.toDataURL('image/png');
                 
+                // Download the image locally
                 const link = document.createElement('a');
                 link.href = imageDataUrl;
                 link.download = filename;
@@ -1214,26 +1155,29 @@
                 uploadProgressBar.style.width = '50%';
                 uploadMessage.textContent = 'Saving high-quality image to database...';
 
+                // Check if Firebase services are available
                 if (!window.firebaseServices) {
                     throw new Error('Firebase not initialized. Please check your configuration.');
                 }
 
                 const { database, ref, push, serverTimestamp } = window.firebaseServices;
+
                 uploadProgressBar.style.width = '70%';
 
-                const imageSize = Math.round((imageDataUrl.length * 3) / 4);
+                // Calculate image size (approximate)
+                const imageSize = Math.round((imageDataUrl.length * 3) / 4); // Base64 size estimation
                 const imageSizeMB = (imageSize / (1024 * 1024)).toFixed(2);
 
+                // Save to Firebase Realtime Database
                 const imageData = {
                     filename: filename,
-                    imageData: imageDataUrl,
+                    imageData: imageDataUrl, // Store base64 data directly
                     uploadedAt: serverTimestamp(),
                     size: imageSize,
                     sizeMB: imageSizeMB,
                     type: 'image/png',
                     quality: 'high',
                     resolution: `${canvas.width}x${canvas.height}`,
-                    camera: availableCameras[currentCameraIndex]?.type || 'Gallery',
                     settings: {
                         zoom: zoomLevel,
                         xPosition: xPosition,
@@ -1251,6 +1195,7 @@
                 uploadMessage.textContent = `✅ High-quality image (${imageSizeMB}MB, ${canvas.width}x${canvas.height}) successfully saved!`;
                 uploadMessage.className = 'success';
 
+                // Reset button after success
                 setTimeout(() => {
                     downloadBtn.disabled = false;
                     downloadBtn.textContent = '⬇️ Save';
@@ -1264,6 +1209,7 @@
                 uploadMessage.textContent = `❌ Save failed: ${error.message}`;
                 uploadMessage.className = 'error';
 
+                // Reset button after error
                 setTimeout(() => {
                     downloadBtn.disabled = false;
                     downloadBtn.textContent = '⬇️ Save';
@@ -1272,20 +1218,19 @@
             }
         }
 
+        function viewGallery() {
+            // Open gallery page in new tab
+            window.open('gallery.html', '_blank');
+        }
+
         function startOver() {
+            // Reset everything
             backgroundImage = null;
             zoomLevel = 100;
             xPosition = 0;
             yPosition = 0;
             document.getElementById('finalResult').style.display = 'none';
             goToStep(1);
-        }
-
-        // Initialize camera and load target frame
-        async function initialize() {
-            await loadTargetImage();
-            await discoverCameras();
-            await startCamera();
         }
 
         // Handle page visibility changes to stop camera
@@ -1298,3 +1243,6 @@
 
         // Initialize on load
         window.onload = initialize;
+    </script>
+</body>
+</html>
