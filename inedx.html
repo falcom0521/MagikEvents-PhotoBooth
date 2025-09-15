@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MagikEvents</title>
+    <!-- Firebase SDKs for Spark Plan -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getDatabase, ref, push, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDcgeMu5fPC1UCTBu7hgPYn-Xn6WUbPJoA",
+  authDomain: "magikevents-bb514.firebaseapp.com",
+  projectId: "magikevents-bb514",
+  storageBucket: "magikevents-bb514.firebasestorage.app",
+  messagingSenderId: "492099076261",
+  appId: "1:492099076261:web:dbf80896539d28ece70d4c",
+  measurementId: "G-S21N9W5PCR",
+            databaseURL: "https://magikevents-bb514-default-rtdb.asia-southeast1.firebasedatabase.app" // Add this line
+        };
+
+        
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // Make Firebase services available globally
+        window.firebaseServices = {
+            database,
+            ref,
+            push,
+            serverTimestamp
+        };
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Step Sections */
+        .step-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .step-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Step 1: Camera Capture */
+        .camera-section {
+            text-align: center;
+        }
+
+        .camera-video {
+            width: 100%;
+            max-width: 400px;
+            height: 300px;
+            border-radius: 20px;
+            background: #f8f9fa;
+            margin: 20px 0;
+            object-fit: cover;
+            border: 2px solid #dee2e6;
+        }
+
+        .camera-controls {
+            margin: 30px 0;
+        }
+
+        .shutter-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #dc3545, #e83e8c);
+            border: 6px solid white;
+            cursor: pointer;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(220, 53, 69, 0.3);
+        }
+
+        .shutter-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(220, 53, 69, 0.4);
+        }
+
+        .shutter-btn:active {
+            transform: scale(0.95);
+        }
+
+        .gallery-option {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #dee2e6;
+        }
+
+        .gallery-option p {
+            color: #6c757d;
+        }
+
+        .gallery-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 auto;
+        }
+
+        .gallery-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .camera-error {
+            color: #dc3545;
+            text-align: center;
+            padding: 20px;
+            font-size: 1.1rem;
+            background: rgba(220, 53, 69, 0.1);
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        /* Step 2: Controls (previously step 3) */
+        .controls-section {
+            text-align: center;
+        }
+
+        .background-preview-container {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            border: 3px solid #667eea;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 0 auto 30px;
+            background: #f8f9fa;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .background-preview-image {
+            position: absolute;
+            transform-origin: center;
+            transition: transform 0.1s ease;
+        }
+
+        .preview-label {
+            margin-top: 15px;
+            font-size: 1rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .zoom-controls {
+            background: rgba(248, 249, 250, 0.9);
+            padding: 25px;
+            border-radius: 20px;
+            border: 2px solid #667eea;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .zoom-controls h3 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #343a40;
+            font-size: 1.4rem;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .control-group {
+            text-align: center;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #343a40;
+            font-size: 1rem;
+        }
+
+        .control-slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #dee2e6;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .control-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-slider::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .button-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .composite-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .composite-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(40, 167, 69, 0.3);
+        }
+
+        .retake-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #fd7e14, #e63946);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .retake-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(253, 126, 20, 0.3);
+        }
+
+        /* Step 3: Final Result (previously step 4) */
+        .result-section {
+            text-align: center;
+        }
+
+        .final-image {
+            width: 300px;
+            max-width: 90%;
+            height: 450px;
+            object-fit: cover;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            margin: 30px auto;
+            border: 4px solid #667eea;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #dc3545, #e83e8c);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin: 20px 10px;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(220, 53, 69, 0.3);
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #fd7e14, #e63946);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin: 20px 10px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(253, 126, 20, 0.3);
+        }
+
+        .new-photo-btn {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin: 20px 10px;
+            transition: all 0.3s ease;
+        }
+
+        .new-photo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(108, 117, 125, 0.3);
+        }
+
+        .gallery-view-btn {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            margin: 20px 10px;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(23, 162, 184, 0.3);
+        }
+
+        #uploadStatus {
+            background: rgba(248, 249, 250, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+        }
+
+        #uploadMessage {
+            color: #343a40;
+            font-weight: 500;
+        }
+
+        #uploadMessage.success {
+            color: #28a745;
+        }
+
+        #uploadMessage.error {
+            color: #dc3545;
+        }
+
+        .canvas-container {
+            display: none;
+        }
+
+        .loading-message {
+            color: #667eea;
+            font-style: italic;
+            font-size: 1.1rem;
+        }
+
+        .step-title {
+            color: #343a40;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .plan-notice {
+            background: rgba(23, 162, 184, 0.1);
+            border: 1px solid rgba(23, 162, 184, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .plan-notice-text {
+            color: #17a2b8;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .camera-video {
+                max-width: 100%;
+                height: 250px;
+            }
+
+            .background-preview-container {
+                width: 250px;
+                height: 350px;
+            }
+
+            .button-row {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .composite-btn, .retake-btn {
+                width: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Magik Events</h1>
+        
+
+        <!-- Step 1: Camera Capture -->
+        <div class="step-section active" id="step1">
+            <div class="camera-section">
+                <h2 class="step-title">📷 Capture Your Photo</h2>
+                <video id="cameraVideo" class="camera-video" autoplay playsinline></video>
+                <canvas id="captureCanvas" style="display: none;"></canvas>
+                
+                <div class="camera-controls">
+                    <div class="shutter-btn" onclick="capturePhoto()">
+                        📸
+                    </div>
+                </div>
+
+                <div class="gallery-option">
+                    <p style="color: #6c757d; margin-bottom: 15px;">Or upload from gallery</p>
+                    <input type="file" id="backgroundInput" class="file-input" accept="image/*" onchange="handleFileSelect(event)">
+                    <button class="gallery-btn" onclick="document.getElementById('backgroundInput').click()">
+                        📁 Choose from Gallery
+                    </button>
+                </div>
+
+                <div id="cameraError" class="camera-error" style="display: none;"></div>
+            </div>
+        </div>
+
+        <!-- Step 2: Background Controls (previously step 3) -->
+        <div class="step-section" id="step2">
+            <div class="controls-section">
+                <h2 class="step-title">🎛️ Adjust Your Photo</h2>
+                
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h4 style="margin-bottom: 15px; color: #343a40;">Live Preview</h4>
+                    <div class="background-preview-container" id="backgroundPreviewContainer">
+                        <img id="backgroundPreviewImage" class="background-preview-image">
+                    </div>
+                    <div class="preview-label">Adjust position and zoom below</div>
+                </div>
+
+                <div class="zoom-controls">
+                    <div class="controls-grid">
+                        <div class="control-group">
+                            <label for="zoomSlider">🔍 Zoom: <span id="zoomValue">100%</span></label>
+                            <input type="range" id="zoomSlider" class="control-slider" min="50" max="300" value="100">
+                        </div>
+                        <div class="control-group">
+                            <label for="xSlider">↔️ Horizontal: <span id="xValue">0</span></label>
+                            <input type="range" id="xSlider" class="control-slider" min="-100" max="100" value="0">
+                        </div>
+                        <div class="control-group">
+                            <label for="ySlider">↕️ Vertical: <span id="yValue">0</span></label>
+                            <input type="range" id="ySlider" class="control-slider" min="-100" max="100" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button class="retake-btn" onclick="retakePhoto()">
+                        📷 Retake Photo
+                    </button>
+                    <button class="composite-btn" onclick="processImages()">
+                        ✨ Create Final Image
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Final Result (previously step 4) -->
+        <div class="step-section" id="step3">
+            <div class="result-section">
+                <h2 class="step-title">🎉 Your Final Image</h2>
+                <img id="finalResult" class="final-image" style="display: none;">
+                
+                <div style="margin-top: 30px;">
+                    <button class="back-btn" onclick="goToStep(2)">
+                        ⬅️ Back to Adjust
+                    </button>
+                    <button class="download-btn" onclick="downloadAndUploadImage()" id="downloadBtn">
+                        ⬇️  Save
+                    </button>
+                    <button class="new-photo-btn" onclick="startOver()">
+                        🆕 Take New Photo
+                    </button>
+                    <!-- <button class="gallery-view-btn" onclick="viewGallery()">
+                        🖼️ View Gallery
+                    </button> -->
+                </div>
+                
+                <div id="uploadStatus" style="margin-top: 20px; text-align: center; display: none;">
+                    <p id="uploadMessage" style="font-size: 1.1rem; margin-bottom: 10px;"></p>
+                    <div id="uploadProgress" style="width: 100%; background: #e9ecef; border-radius: 10px; height: 6px; overflow: hidden;">
+                        <div id="uploadProgressBar" style="height: 100%; background: linear-gradient(135deg, #28a745, #20c997); width: 0%; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="compositeCanvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let targetImage = null;
+        let backgroundImage = null;
+        let zoomLevel = 100;
+        let xPosition = 0;
+        let yPosition = 0;
+        let stream = null;
+        let currentStep = 1;
+
+        // Initialize camera and load target frame
+        async function initialize() {
+            await loadTargetImage();
+            await startCamera();
+        }
+
+        async function startCamera() {
+            const video = document.getElementById('cameraVideo');
+            const errorDiv = document.getElementById('cameraError');
+            
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: 'environment' // Use back camera on mobile
+                    } 
+                });
+                
+                video.srcObject = stream;
+                errorDiv.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Camera access error:', error);
+                errorDiv.style.display = 'block';
+                errorDiv.textContent = 'Camera access denied. Please use "Choose from Gallery" option below.';
+            }
+        }
+
+        function loadTargetImage() {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = function() {
+                    targetImage = img;
+                    resolve();
+                };
+                img.onerror = function() {
+                    // Create a simple frame if frame.png is not found
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 160;
+                    canvas.height = 240;
+                    
+                    // Draw a simple frame
+                    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                    ctx.fillRect(0, 0, 160, 240);
+                    ctx.clearRect(20, 20, 120, 200);
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(20, 20, 120, 200);
+                    
+                    targetImage = new Image();
+                    targetImage.src = canvas.toDataURL();
+                    resolve();
+                };
+                img.src = './frame.png';
+            });
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.getElementById('captureCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            if (video.videoWidth === 0 || video.videoHeight === 0) {
+                alert('Camera not ready. Please wait a moment and try again.');
+                return;
+            }
+            
+            // Set canvas size to match video
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            // Draw the video frame to canvas
+            ctx.drawImage(video, 0, 0);
+            
+            // Convert canvas to image
+            canvas.toBlob(function(blob) {
+                const img = new Image();
+                img.onload = function() {
+                    backgroundImage = img;
+                    goToStep(2);
+                };
+                img.src = URL.createObjectURL(blob);
+            }, 'image/jpeg', 0.8);
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    backgroundImage = img;
+                    goToStep(2);
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function retakePhoto() {
+            // Reset settings
+            zoomLevel = 100;
+            xPosition = 0;
+            yPosition = 0;
+            backgroundImage = null;
+            
+            // Go back to camera step
+            goToStep(1);
+        }
+
+        function goToStep(step) {
+            // Hide all steps
+            document.querySelectorAll('.step-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show target step
+            document.getElementById(`step${step}`).classList.add('active');
+            currentStep = step;
+            
+            // Setup step-specific functionality
+            if (step === 1) {
+                startCamera();
+            } else if (step === 2) {
+                setupBackgroundControls();
+            }
+            
+            // Stop camera when leaving step 1
+            if (step !== 1 && stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        }
+
+        function setupBackgroundControls() {
+            if (!backgroundImage) return;
+            
+            const previewImg = document.getElementById('backgroundPreviewImage');
+            previewImg.src = backgroundImage.src;
+            previewImg.style.display = 'block';
+            
+            // Keep current control values when coming back from final result
+            document.getElementById('zoomSlider').value = zoomLevel;
+            document.getElementById('xSlider').value = xPosition;
+            document.getElementById('ySlider').value = yPosition;
+            document.getElementById('zoomValue').textContent = zoomLevel + '%';
+            document.getElementById('xValue').textContent = xPosition;
+            document.getElementById('yValue').textContent = yPosition;
+            
+            updateBackgroundPreview();
+            setupControlListeners();
+        }
+
+        function setupControlListeners() {
+            document.getElementById('zoomSlider').oninput = function() {
+                zoomLevel = parseInt(this.value);
+                document.getElementById('zoomValue').textContent = zoomLevel + '%';
+                updateBackgroundPreview();
+            };
+            document.getElementById('xSlider').oninput = function() {
+                xPosition = parseInt(this.value);
+                document.getElementById('xValue').textContent = xPosition;
+                updateBackgroundPreview();
+            };
+            document.getElementById('ySlider').oninput = function() {
+                yPosition = parseInt(this.value);
+                document.getElementById('yValue').textContent = yPosition;
+                updateBackgroundPreview();
+            };
+        }
+
+        function updateBackgroundPreview() {
+            const previewImg = document.getElementById('backgroundPreviewImage');
+            const container = document.getElementById('backgroundPreviewContainer');
+            if (!backgroundImage) return;
+            
+            const containerW = container.offsetWidth;
+            const containerH = container.offsetHeight;
+            const imgAspect = backgroundImage.width / backgroundImage.height;
+            let previewWidth, previewHeight;
+            
+            if (imgAspect > containerW / containerH) {
+                previewHeight = containerH;
+                previewWidth = containerH * imgAspect;
+            } else {
+                previewWidth = containerW;
+                previewHeight = containerW / imgAspect;
+            }
+            
+            const scale = zoomLevel / 100;
+            previewWidth *= scale;
+            previewHeight *= scale;
+            
+            const maxOffsetX = Math.max(0, (previewWidth - containerW) / 2);
+            const maxOffsetY = Math.max(0, (previewHeight - containerH) / 2);
+            const xOffset = (xPosition / 100) * maxOffsetX;
+            const yOffset = (yPosition / 100) * maxOffsetY;
+            
+            previewImg.style.width = previewWidth + 'px';
+            previewImg.style.height = previewHeight + 'px';
+            previewImg.style.left = (containerW - previewWidth) / 2 + xOffset + 'px';
+            previewImg.style.top = (containerH - previewHeight) / 2 + yOffset + 'px';
+        }
+
+        function processImages() {
+            if (!targetImage || !backgroundImage) return;
+            
+            const canvas = document.getElementById('compositeCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = 160;
+            canvas.height = 240;
+            
+            // Calculate scaling and positioning
+            const scaleX = canvas.width / backgroundImage.width;
+            const scaleY = canvas.height / backgroundImage.height;
+            const baseScale = Math.max(scaleX, scaleY);
+            const finalScale = baseScale * (zoomLevel / 100);
+            const scaledWidth = backgroundImage.width * finalScale;
+            const scaledHeight = backgroundImage.height * finalScale;
+            
+            const baseOffsetX = (canvas.width - scaledWidth) / 2;
+            const baseOffsetY = (canvas.height - scaledHeight) / 2;
+            const maxOffsetX = Math.max(0, (scaledWidth - canvas.width) / 2);
+            const maxOffsetY = Math.max(0, (scaledHeight - canvas.height) / 2);
+            const finalOffsetX = baseOffsetX + (xPosition / 100) * maxOffsetX;
+            const finalOffsetY = baseOffsetY + (yPosition / 100) * maxOffsetY;
+            
+            // Draw composite image
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(backgroundImage, finalOffsetX, finalOffsetY, scaledWidth, scaledHeight);
+            ctx.drawImage(targetImage, 0, 0, canvas.width, canvas.height);
+            
+            // Show final result
+            const finalResult = document.getElementById('finalResult');
+            finalResult.src = canvas.toDataURL();
+            finalResult.style.display = 'block';
+            
+            goToStep(3);
+        }
+
+        async function downloadAndUploadImage() {
+            const canvas = document.getElementById('compositeCanvas');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const uploadStatus = document.getElementById('uploadStatus');
+            const uploadMessage = document.getElementById('uploadMessage');
+            const uploadProgressBar = document.getElementById('uploadProgressBar');
+
+            // Disable button and show loading
+            downloadBtn.disabled = true;
+            downloadBtn.textContent = '⏳ Processing...';
+            uploadStatus.style.display = 'block';
+            uploadMessage.textContent = 'Preparing image for save...';
+            uploadMessage.className = '';
+            uploadProgressBar.style.width = '20%';
+
+            try {
+                // First, download the image locally
+                const now = new Date();
+                const timestamp = now.getFullYear() + 
+                                String(now.getMonth() + 1).padStart(2, '0') + 
+                                String(now.getDate()).padStart(2, '0') + '_' +
+                                String(now.getHours()).padStart(2, '0') + 
+                                String(now.getMinutes()).padStart(2, '0') + 
+                                String(now.getSeconds()).padStart(2, '0');
+                
+                const filename = `magik-events-${timestamp}.png`;
+                const link = document.createElement('a');
+                // link.download = filename;
+                const imageDataUrl = canvas.toDataURL('image/png', 1.0);
+                link.href = imageDataUrl;
+                link.click();
+
+                uploadProgressBar.style.width = '50%';
+                uploadMessage.textContent = 'Saving to database...';
+
+                // Check if Firebase services are available
+                if (!window.firebaseServices) {
+                    throw new Error('Firebase not initialized. Please check your configuration.');
+                }
+
+                const { database, ref, push, serverTimestamp } = window.firebaseServices;
+
+                uploadProgressBar.style.width = '70%';
+
+                // Calculate image size (approximate)
+                const imageSize = Math.round((imageDataUrl.length * 3) / 4); // Base64 size estimation
+
+                // Save to Firebase Realtime Database
+                const imageData = {
+                    filename: filename,
+                    imageData: imageDataUrl, // Store base64 data directly
+                    uploadedAt: serverTimestamp(),
+                    size: imageSize,
+                    type: 'image/png'
+                };
+
+                uploadProgressBar.style.width = '90%';
+                uploadMessage.textContent = 'Finalizing save...';
+
+                const imagesRef = ref(database, 'magik-events-images');
+                await push(imagesRef, imageData);
+
+                uploadProgressBar.style.width = '100%';
+                uploadMessage.textContent = '✅ Image successfully saved to database!';
+                uploadMessage.className = 'success';
+
+                // Reset button after success
+                setTimeout(() => {
+                    downloadBtn.disabled = false;
+                    downloadBtn.textContent = '⬇️ Download & Save';
+                    uploadStatus.style.display = 'none';
+                    uploadProgressBar.style.width = '0%';
+                }, 3000);
+
+            } catch (error) {
+                console.error('Save failed:', error);
+                uploadProgressBar.style.width = '0%';
+                uploadMessage.textContent = `❌ Save failed: ${error.message}`;
+                uploadMessage.className = 'error';
+
+                // Reset button after error
+                setTimeout(() => {
+                    downloadBtn.disabled = false;
+                    downloadBtn.textContent = '⬇️ Download & Save';
+                    uploadStatus.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function viewGallery() {
+            // Open gallery page in new tab
+            window.open('gallery.html', '_blank');
+        }
+
+        function startOver() {
+            // Reset everything
+            backgroundImage = null;
+            zoomLevel = 100;
+            xPosition = 0;
+            yPosition = 0;
+            document.getElementById('finalResult').style.display = 'none';
+            goToStep(1);
+        }
+
+        // Handle page visibility changes to stop camera
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+        });
+
+        // Initialize on load
+        window.onload = initialize;
+    </script>
+</body>
+</html>

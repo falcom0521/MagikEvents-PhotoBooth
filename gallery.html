@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MagikEvents - Gallery</title>
+    <!-- Firebase SDKs for Spark Plan -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getDatabase, ref, onValue, remove } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDcgeMu5fPC1UCTBu7hgPYn-Xn6WUbPJoA",
+            authDomain: "magikevents-bb514.firebaseapp.com",
+            projectId: "magikevents-bb514",
+            storageBucket: "magikevents-bb514.firebasestorage.app",
+            messagingSenderId: "492099076261",
+            appId: "1:492099076261:web:dbf80896539d28ece70d4c",
+            measurementId: "G-S21N9W5PCR",
+            databaseURL: "https://magikevents-bb514-default-rtdb.asia-southeast1.firebasedatabase.app"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        window.firebaseServices = {
+            database,
+            ref,
+            onValue,
+            remove
+        };
+
+        window.addEventListener('load', loadGalleryImages);
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #f8f9fa;
+            min-height: 100vh;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 30px 40px;
+            border-bottom: 1px solid #e9ecef;
+            background: white;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .back-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .back-btn:hover {
+            background: #0056b3;
+        }
+
+        .gallery-content {
+            padding: 20px 40px;
+        }
+
+        .loading-message, .error-message {
+            text-align: center;
+            padding: 60px 20px;
+            font-size: 1rem;
+        }
+
+        .loading-message {
+            color: #6c757d;
+        }
+
+        .error-message {
+            color: #dc3545;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 6px;
+        }
+
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .stats-text {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .gallery-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .gallery-table th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 500;
+            color: #495057;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 0.9rem;
+        }
+
+        .gallery-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f1f3f4;
+            vertical-align: middle;
+        }
+
+        .gallery-table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        .row-number {
+            font-weight: 500;
+            color: #6c757d;
+            width: 60px;
+        }
+
+        .image-thumbnail {
+            width: 60px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 4px;
+            cursor: pointer;
+            border: 1px solid #dee2e6;
+            transition: all 0.2s ease;
+        }
+
+        .image-thumbnail:hover {
+            transform: scale(1.05);
+            border-color: #007bff;
+        }
+
+        .image-info {
+            max-width: 200px;
+        }
+
+        .image-filename {
+            font-weight: 500;
+            color: #2c3e50;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+
+        .image-date {
+            color: #6c757d;
+            font-size: 0.8rem;
+        }
+
+        .actions-cell {
+            width: 180px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s ease;
+            min-width: 60px;
+        }
+
+        .print-btn {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .print-btn:hover {
+            background: #138496;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+        }
+
+        .empty-gallery {
+            text-align: center;
+            padding: 80px 20px;
+            color: #6c757d;
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .empty-text {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .empty-subtext {
+            font-size: 0.9rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 90%;
+            max-height: 90%;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .modal-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            max-width: 500px;
+            max-height: 600px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            background: rgba(0, 0, 0, 0.6);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        /* Print Styles */
+        @media print {
+            * {
+                visibility: hidden;
+            }
+            
+            .print-content,
+            .print-content * {
+                visibility: visible;
+            }
+            
+            .print-content {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                text-align: center;
+                padding: 20px;
+            }
+            
+            .print-image {
+                max-width: 100%;
+                max-height: 80vh;
+                width: auto;
+                height: auto;
+                display: block;
+                margin: 0 auto;
+            }
+
+            .print-filename {
+                font-size: 14px;
+                font-weight: bold;
+                margin-bottom: 10px;
+                color: #000;
+            }
+
+            .print-date {
+                font-size: 12px;
+                margin-bottom: 20px;
+                color: #666;
+            }
+
+            @page {
+                margin: 0.5in;
+                size: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+
+            .gallery-content {
+                padding: 20px;
+            }
+
+            .gallery-table {
+                font-size: 0.8rem;
+            }
+
+            .gallery-table th,
+            .gallery-table td {
+                padding: 10px 8px;
+            }
+
+            .image-thumbnail {
+                width: 50px;
+                height: 65px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .action-btn {
+                font-size: 0.75rem;
+                padding: 4px 8px;
+            }
+
+            .row-number {
+                width: 40px;
+            }
+
+            .image-info {
+                max-width: 120px;
+            }
+
+            .actions-cell {
+                width: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <h1>Gallery</h1>
+                <button class="back-btn" onclick="window.close(); window.opener?.focus();">
+                    Back to Camera
+                </button>
+            </div>
+        </div>
+
+        <div class="gallery-content">
+            <div id="loadingMessage" class="loading-message">
+                Loading your gallery...
+            </div>
+
+            <div id="errorMessage" class="error-message" style="display: none;"></div>
+
+            <div id="galleryStats" class="stats-bar" style="display: none;">
+                <span class="stats-text">Total Images: <span id="imageCount">0</span></span>
+            </div>
+
+            <div id="galleryTable" style="display: none;">
+                <table class="gallery-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Image</th>
+                            <th>Details</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="galleryTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="emptyGallery" class="empty-gallery" style="display: none;">
+                <div class="empty-icon">📷</div>
+                <div class="empty-text">No images yet</div>
+                <div class="empty-subtext">Start capturing moments with your camera</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Preview Modal -->
+    <div id="imageModal" class="modal">
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <div class="modal-content">
+            <img id="modalImage" class="modal-image" src="" alt="">
+        </div>
+    </div>
+
+    <!-- Hidden print container -->
+    <div id="printContainer" class="print-content" style="display: none;">
+        <div class="print-filename" id="printFilename"></div>
+        <div class="print-date" id="printDate"></div>
+        <img id="printImage" class="print-image" src="" alt="">
+    </div>
+
+    <script>
+        let allImages = [];
+
+        async function loadGalleryImages() {
+            const loadingMessage = document.getElementById('loadingMessage');
+            const errorMessage = document.getElementById('errorMessage');
+            const galleryTable = document.getElementById('galleryTable');
+            const galleryStats = document.getElementById('galleryStats');
+            const emptyGallery = document.getElementById('emptyGallery');
+            const imageCount = document.getElementById('imageCount');
+
+            try {
+                loadingMessage.style.display = 'block';
+                errorMessage.style.display = 'none';
+                galleryTable.style.display = 'none';
+                galleryStats.style.display = 'none';
+                emptyGallery.style.display = 'none';
+
+                if (!window.firebaseServices) {
+                    throw new Error('Firebase not initialized. Please check your configuration.');
+                }
+
+                const { database, ref, onValue } = window.firebaseServices;
+                const imagesRef = ref(database, 'magik-events-images');
+                
+                onValue(imagesRef, (snapshot) => {
+                    allImages = [];
+                    
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        Object.keys(data).forEach(key => {
+                            allImages.push({
+                                id: key,
+                                ...data[key]
+                            });
+                        });
+
+                        // Sort by newest first (descending order)
+                        allImages.sort((a, b) => {
+                            if (a.uploadedAt && b.uploadedAt) {
+                                return b.uploadedAt - a.uploadedAt;
+                            }
+                            return 0;
+                        });
+                    }
+
+                    loadingMessage.style.display = 'none';
+
+                    if (allImages.length === 0) {
+                        emptyGallery.style.display = 'block';
+                    } else {
+                        imageCount.textContent = allImages.length;
+                        galleryStats.style.display = 'flex';
+                        displayImages(allImages);
+                        galleryTable.style.display = 'block';
+                    }
+                }, (error) => {
+                    console.error('Error loading images:', error);
+                    loadingMessage.style.display = 'none';
+                    errorMessage.textContent = `Error loading gallery: ${error.message}`;
+                    errorMessage.style.display = 'block';
+                });
+
+            } catch (error) {
+                console.error('Error initializing gallery:', error);
+                loadingMessage.style.display = 'none';
+                errorMessage.textContent = `Error initializing gallery: ${error.message}`;
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        function displayImages(images) {
+            const tableBody = document.getElementById('galleryTableBody');
+            tableBody.innerHTML = '';
+
+            images.forEach((image, index) => {
+                // Display numbers from highest to lowest (total - current index)
+                const rowNumber = images.length - index;
+                const row = createImageRow(image, rowNumber);
+                tableBody.appendChild(row);
+            });
+        }
+
+        function createImageRow(image, rowNumber) {
+            const row = document.createElement('tr');
+            
+            let dateString = 'Unknown date';
+            if (image.uploadedAt) {
+                dateString = new Date(image.uploadedAt).toLocaleDateString();
+            }
+
+            row.innerHTML = `
+                <td class="row-number">${rowNumber}</td>
+                <td>
+                    <img class="image-thumbnail" 
+                         src="${image.imageData}" 
+                         alt="${image.filename}"
+                         onclick="openModal('${image.imageData}', '${image.filename}')"
+                         loading="lazy">
+                </td>
+                <td class="image-info">
+                    <div class="image-filename">${image.filename}</div>
+                    <div class="image-date">${dateString}</div>
+                </td>
+                <td class="actions-cell">
+                    <div class="action-buttons">
+                        <button class="action-btn print-btn" onclick="printImage('${image.imageData}', '${image.filename}', '${dateString}')">
+                            Print
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteImage('${image.id}', '${image.filename}')">
+                            Delete
+                        </button>
+                    </div>
+                </td>
+            `;
+
+            return row;
+        }
+
+        function openModal(imageData, filename) {
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = imageData;
+            modalImage.alt = filename;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.style.display = 'none';
+        }
+
+        function printImage(imageData, filename, dateString) {
+            // Set up the print content
+            const printImage = document.getElementById('printImage');
+            const printFilename = document.getElementById('printFilename');
+            const printDate = document.getElementById('printDate');
+            const printContainer = document.getElementById('printContainer');
+            
+            printImage.src = imageData;
+            printImage.alt = filename;
+            printFilename.textContent = filename;
+            printDate.textContent = `Printed on: ${new Date().toLocaleDateString()} | Image date: ${dateString}`;
+            
+            // Show the print container temporarily
+            printContainer.style.display = 'block';
+            
+            // Wait for image to load before printing
+            printImage.onload = function() {
+                setTimeout(() => {
+                    window.print();
+                    // Hide the print container after printing
+                    setTimeout(() => {
+                        printContainer.style.display = 'none';
+                    }, 100);
+                }, 100);
+            };
+            
+            // If image is already loaded
+            if (printImage.complete) {
+                setTimeout(() => {
+                    window.print();
+                    setTimeout(() => {
+                        printContainer.style.display = 'none';
+                    }, 100);
+                }, 100);
+            }
+        }
+
+        async function deleteImage(imageId, filename) {
+            if (!confirm(`Are you sure you want to delete "${filename}"? This action cannot be undone.`)) {
+                return;
+            }
+
+            try {
+                const { database, ref, remove } = window.firebaseServices;
+                const imageRef = ref(database, `magik-events-images/${imageId}`);
+                await remove(imageRef);
+                // The onValue listener will automatically update the UI
+            } catch (error) {
+                console.error('Error deleting image:', error);
+                alert(`Error deleting image: ${error.message}`);
+            }
+        }
+
+        // Close modal when clicking outside the image
+        document.getElementById('imageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
