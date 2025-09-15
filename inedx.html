@@ -448,6 +448,22 @@
             margin: 0;
         }
 
+        .quality-info {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .quality-info-text {
+            color: #28a745;
+            font-size: 0.9rem;
+            margin: 0;
+            font-weight: 500;
+        }
+
         @media (max-width: 768px) {
             .controls-grid {
                 grid-template-columns: 1fr;
@@ -486,6 +502,9 @@
     <div class="container">
         <h1>Magik Events</h1>
         
+        <div class="quality-info">
+            <p class="quality-info-text">📸 High Quality Mode: Maximum resolution and zero compression for professional results</p>
+        </div>
 
         <!-- Step 1: Camera Capture -->
         <div class="step-section active" id="step1">
@@ -596,6 +615,23 @@
         let yPosition = 0;
         let stream = null;
         let currentStep = 1;
+        
+        // High quality settings
+        const HIGH_QUALITY_SETTINGS = {
+            // Use much higher resolution for final output
+            finalWidth: 1200,  // Increased from 160
+            finalHeight: 1800, // Increased from 240 (maintaining 2:3 aspect ratio)
+            // Maximum quality settings
+            jpegQuality: 1.0,  // Maximum JPEG quality (if needed)
+            pngQuality: 1.0,   // Maximum PNG quality
+            // Camera constraints for highest quality
+            videoConstraints: {
+                facingMode: 'environment',
+                width: { ideal: 1920 },     // Request high resolution
+                height: { ideal: 1080 },    // Request high resolution
+                aspectRatio: 16/9
+            }
+        };
 
         // Initialize camera and load target frame
         async function initialize() {
@@ -608,10 +644,9 @@
             const errorDiv = document.getElementById('cameraError');
             
             try {
+                // Request highest quality camera stream
                 stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'environment' // Use back camera on mobile
-                    } 
+                    video: HIGH_QUALITY_SETTINGS.videoConstraints
                 });
                 
                 video.srcObject = stream;
@@ -632,22 +667,29 @@
                     resolve();
                 };
                 img.onerror = function() {
-                    // Create a simple frame if frame.png is not found
+                    // Create a high-quality frame if frame.png is not found
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    canvas.width = 160;
-                    canvas.height = 240;
                     
-                    // Draw a simple frame
+                    // Use high resolution for the frame
+                    canvas.width = HIGH_QUALITY_SETTINGS.finalWidth;
+                    canvas.height = HIGH_QUALITY_SETTINGS.finalHeight;
+                    
+                    // Draw a high-quality frame with smooth edges
                     ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                    ctx.fillRect(0, 0, 160, 240);
-                    ctx.clearRect(20, 20, 120, 200);
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    const frameThickness = Math.floor(canvas.width * 0.08); // 8% of width
+                    const innerWidth = canvas.width - (frameThickness * 2);
+                    const innerHeight = canvas.height - (frameThickness * 2);
+                    
+                    ctx.clearRect(frameThickness, frameThickness, innerWidth, innerHeight);
                     ctx.strokeStyle = '#333';
-                    ctx.lineWidth = 4;
-                    ctx.strokeRect(20, 20, 120, 200);
+                    ctx.lineWidth = Math.floor(frameThickness * 0.2);
+                    ctx.strokeRect(frameThickness, frameThickness, innerWidth, innerHeight);
                     
                     targetImage = new Image();
-                    targetImage.src = canvas.toDataURL();
+                    targetImage.src = canvas.toDataURL('image/png'); // Use PNG for frame
                     resolve();
                 };
                 img.src = './frame.png';
@@ -664,22 +706,27 @@
                 return;
             }
             
-            // Set canvas size to match video
+            // Set canvas to the actual video resolution for maximum quality
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             
-            // Draw the video frame to canvas
-            ctx.drawImage(video, 0, 0);
+            // Ensure high quality rendering
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
             
-            // Convert canvas to image
+            // Draw the video frame to canvas at full resolution
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Convert canvas to high-quality PNG (lossless)
             canvas.toBlob(function(blob) {
                 const img = new Image();
                 img.onload = function() {
                     backgroundImage = img;
+                    console.log(`Captured image: ${img.width}x${img.height}`);
                     goToStep(2);
                 };
                 img.src = URL.createObjectURL(blob);
-            }, 'image/jpeg', 0.8);
+            }, 'image/png'); // Use PNG instead of JPEG to avoid compression
         }
 
         function handleFileSelect(event) {
@@ -691,6 +738,7 @@
                 const img = new Image();
                 img.onload = function() {
                     backgroundImage = img;
+                    console.log(`Loaded image: ${img.width}x${img.height}`);
                     goToStep(2);
                 };
                 img.src = e.target.result;
@@ -808,10 +856,18 @@
             
             const canvas = document.getElementById('compositeCanvas');
             const ctx = canvas.getContext('2d');
-            canvas.width = 160;
-            canvas.height = 240;
             
-            // Calculate scaling and positioning
+            // Use high resolution for final output
+            canvas.width = HIGH_QUALITY_SETTINGS.finalWidth;
+            canvas.height = HIGH_QUALITY_SETTINGS.finalHeight;
+            
+            // Enable high-quality rendering
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            
+            console.log(`Processing at ${canvas.width}x${canvas.height} resolution`);
+            
+            // Calculate scaling and positioning for high resolution
             const scaleX = canvas.width / backgroundImage.width;
             const scaleY = canvas.height / backgroundImage.height;
             const baseScale = Math.max(scaleX, scaleY);
@@ -826,16 +882,21 @@
             const finalOffsetX = baseOffsetX + (xPosition / 100) * maxOffsetX;
             const finalOffsetY = baseOffsetY + (yPosition / 100) * maxOffsetY;
             
-            // Draw composite image
+            // Clear canvas with transparent background
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background image at high quality
             ctx.drawImage(backgroundImage, finalOffsetX, finalOffsetY, scaledWidth, scaledHeight);
+            
+            // Draw target frame/overlay at high quality
             ctx.drawImage(targetImage, 0, 0, canvas.width, canvas.height);
             
             // Show final result
             const finalResult = document.getElementById('finalResult');
-            finalResult.src = canvas.toDataURL();
+            finalResult.src = canvas.toDataURL('image/png'); // Use PNG for maximum quality
             finalResult.style.display = 'block';
             
+            console.log('Final composite created at maximum quality');
             goToStep(3);
         }
 
@@ -850,12 +911,12 @@
             downloadBtn.disabled = true;
             downloadBtn.textContent = '⏳ Processing...';
             uploadStatus.style.display = 'block';
-            uploadMessage.textContent = 'Preparing image for save...';
+            uploadMessage.textContent = 'Preparing high-quality image for save...';
             uploadMessage.className = '';
             uploadProgressBar.style.width = '20%';
 
             try {
-                // First, download the image locally
+                // Generate timestamp for filename
                 const now = new Date();
                 const timestamp = now.getFullYear() + 
                                 String(now.getMonth() + 1).padStart(2, '0') + 
@@ -864,15 +925,19 @@
                                 String(now.getMinutes()).padStart(2, '0') + 
                                 String(now.getSeconds()).padStart(2, '0');
                 
-                const filename = `magik-events-${timestamp}.png`;
+                const filename = `magik-events-hq-${timestamp}.png`;
+                
+                // Create high-quality PNG data URL (no compression)
+                const imageDataUrl = canvas.toDataURL('image/png');
+                
+                // Download the image locally
                 const link = document.createElement('a');
-                // link.download = filename;
-                const imageDataUrl = canvas.toDataURL('image/png', 1.0);
                 link.href = imageDataUrl;
+                link.download = filename;
                 link.click();
 
                 uploadProgressBar.style.width = '50%';
-                uploadMessage.textContent = 'Saving to database...';
+                uploadMessage.textContent = 'Saving high-quality image to database...';
 
                 // Check if Firebase services are available
                 if (!window.firebaseServices) {
@@ -885,6 +950,7 @@
 
                 // Calculate image size (approximate)
                 const imageSize = Math.round((imageDataUrl.length * 3) / 4); // Base64 size estimation
+                const imageSizeMB = (imageSize / (1024 * 1024)).toFixed(2);
 
                 // Save to Firebase Realtime Database
                 const imageData = {
@@ -892,26 +958,34 @@
                     imageData: imageDataUrl, // Store base64 data directly
                     uploadedAt: serverTimestamp(),
                     size: imageSize,
-                    type: 'image/png'
+                    sizeMB: imageSizeMB,
+                    type: 'image/png',
+                    quality: 'high',
+                    resolution: `${canvas.width}x${canvas.height}`,
+                    settings: {
+                        zoom: zoomLevel,
+                        xPosition: xPosition,
+                        yPosition: yPosition
+                    }
                 };
 
                 uploadProgressBar.style.width = '90%';
-                uploadMessage.textContent = 'Finalizing save...';
+                uploadMessage.textContent = 'Finalizing high-quality save...';
 
                 const imagesRef = ref(database, 'magik-events-images');
                 await push(imagesRef, imageData);
 
                 uploadProgressBar.style.width = '100%';
-                uploadMessage.textContent = '✅ Image successfully saved to database!';
+                uploadMessage.textContent = `✅ High-quality image (${imageSizeMB}MB, ${canvas.width}x${canvas.height}) successfully saved!`;
                 uploadMessage.className = 'success';
 
                 // Reset button after success
                 setTimeout(() => {
                     downloadBtn.disabled = false;
-                    downloadBtn.textContent = '⬇️ Download & Save';
+                    downloadBtn.textContent = '⬇️ Save';
                     uploadStatus.style.display = 'none';
                     uploadProgressBar.style.width = '0%';
-                }, 3000);
+                }, 4000);
 
             } catch (error) {
                 console.error('Save failed:', error);
@@ -922,7 +996,7 @@
                 // Reset button after error
                 setTimeout(() => {
                     downloadBtn.disabled = false;
-                    downloadBtn.textContent = '⬇️ Download & Save';
+                    downloadBtn.textContent = '⬇️ Save';
                     uploadStatus.style.display = 'none';
                 }, 5000);
             }
