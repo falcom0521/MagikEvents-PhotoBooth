@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MagikEvents PhotoBooth</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>MagikEvents PhotoBooth</h1>
+        </header>
+
+        <main>
+            <!-- Step 1: Camera Capture -->
+            <section class="step-section active" id="step1">
+                <div class="camera-section">
+                    <h2>📷 Capture Your Photo</h2>
+                    
+                    <video id="cameraVideo" class="camera-video" autoplay playsinline></video>
+                    <canvas id="captureCanvas" style="display: none;"></canvas>
+                    
+                    <div class="camera-controls">
+                        <div class="camera-switch-container" id="cameraSwitchContainer">
+                            <!-- Camera buttons will be populated dynamically -->
+                        </div>
+                        
+                        <button class="shutter-btn" onclick="window.appController.capturePhoto()">
+                            📸
+                        </button>
+                    </div>
+
+                    <div class="gallery-option">
+                        <p>Or upload from gallery</p>
+                        <input type="file" id="backgroundInput" class="file-input" accept="image/*" onchange="window.appController.handleFileSelect(event)">
+                        <button class="gallery-btn" onclick="document.getElementById('backgroundInput').click()">
+                            📁 Choose from Gallery
+                        </button>
+                    </div>
+
+                    <div id="cameraError" class="camera-error" style="display: none;"></div>
+                </div>
+            </section>
+
+            <!-- Step 2: Photo Adjustment -->
+            <section class="step-section" id="step2">
+                <div class="controls-section">
+                    <h2>🎛️ Adjust Your Photo</h2>
+                    
+                    <div class="preview-container">
+                        <h4>Live Preview</h4>
+                        <div class="background-preview-container" id="backgroundPreviewContainer">
+                            <img id="backgroundPreviewImage" class="background-preview-image">
+                        </div>
+                        <div class="preview-label">Adjust position and zoom below</div>
+                    </div>
+
+                    <div class="zoom-controls">
+                        <h3>Adjustment Controls</h3>
+                        <div class="controls-grid">
+                            <div class="control-group">
+                                <label for="zoomSlider">🔍 Zoom: <span id="zoomValue">100%</span></label>
+                                <input type="range" id="zoomSlider" class="control-slider" min="50" max="300" value="100">
+                            </div>
+                            <div class="control-group">
+                                <label for="xSlider">↔️ Horizontal: <span id="xValue">0</span></label>
+                                <input type="range" id="xSlider" class="control-slider" min="-100" max="100" value="0">
+                            </div>
+                            <div class="control-group">
+                                <label for="ySlider">↕️ Vertical: <span id="yValue">0</span></label>
+                                <input type="range" id="ySlider" class="control-slider" min="-100" max="100" value="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="button-row">
+                        <button class="btn btn-secondary" onclick="window.appController.retakePhoto()">
+                            📷 Retake Photo
+                        </button>
+                        <button class="btn btn-primary" onclick="window.appController.processImages()">
+                            ✨ Create Final Image
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Step 3: Final Result -->
+            <section class="step-section" id="step3">
+                <div class="result-section">
+                    <h2>🎉 Your Final Image</h2>
+                    
+                    <img id="finalResult" class="final-image" style="display: none;">
+                    
+                    <div class="action-buttons">
+                        <button class="btn btn-outline" onclick="window.appController.goToStep(2)">
+                            ⬅️ Back to Adjust
+                        </button>
+                        <button class="btn btn-dark" onclick="window.appController.saveImage()" id="saveBtn">
+                            💾 Save Image
+                        </button>
+                        <button class="btn btn-outline" onclick="window.appController.startOver()">
+                            🆕 Take New Photo
+                        </button>
+                    </div>
+                    
+                    <div id="uploadStatus" class="upload-status">
+                        <p id="uploadMessage" class="upload-message"></p>
+                        <div id="uploadProgress" class="upload-progress">
+                            <div id="uploadProgressBar" class="upload-progress-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Hidden canvas for image processing -->
+        <div class="canvas-container">
+            <canvas id="compositeCanvas"></canvas>
+        </div>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script src="js/camera-manager.js"></script>
+    <script src="js/image-processor.js"></script>
+    <script src="js/data-manager.js"></script>
+    <script src="js/app-controller.js"></script>
+</body>
+</html>
