@@ -189,12 +189,13 @@
         }
 
         .actions-cell {
-            width: 180px;
+            width: 220px;
         }
 
         .action-buttons {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
         }
 
         .action-btn {
@@ -205,6 +206,15 @@
             font-size: 0.8rem;
             transition: all 0.2s ease;
             min-width: 60px;
+        }
+
+        .download-btn {
+            background: #28a745;
+            color: white;
+        }
+
+        .download-btn:hover {
+            background: #218838;
         }
 
         .print-btn {
@@ -299,7 +309,7 @@
             background: rgba(0, 0, 0, 0.8);
         }
 
-        /* Print Styles */
+        /* Print Styles - Only show the image */
         @media print {
             * {
                 visibility: hidden;
@@ -315,34 +325,25 @@
                 left: 0;
                 top: 0;
                 width: 100%;
+                height: 100%;
                 text-align: center;
-                padding: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0;
+                margin: 0;
             }
             
             .print-image {
                 max-width: 100%;
-                max-height: 80vh;
+                max-height: 100vh;
                 width: auto;
                 height: auto;
-                display: block;
-                margin: 0 auto;
-            }
-
-            .print-filename {
-                font-size: 14px;
-                font-weight: bold;
-                margin-bottom: 10px;
-                color: #000;
-            }
-
-            .print-date {
-                font-size: 12px;
-                margin-bottom: 20px;
-                color: #666;
+                object-fit: contain;
             }
 
             @page {
-                margin: 0.5in;
+                margin: 0;
                 size: auto;
             }
         }
@@ -399,7 +400,7 @@
             }
 
             .actions-cell {
-                width: 80px;
+                width: 90px;
             }
         }
     </style>
@@ -409,9 +410,6 @@
         <div class="header">
             <div class="header-content">
                 <h1>Gallery</h1>
-                <!-- <button class="back-btn" onclick="window.close(); window.opener?.focus();">
-                    Back to Camera
-                </button> -->
             </div>
         </div>
 
@@ -459,8 +457,6 @@
 
     <!-- Hidden print container -->
     <div id="printContainer" class="print-content" style="display: none;">
-        <div class="print-filename" id="printFilename"></div>
-        <div class="print-date" id="printDate"></div>
         <img id="printImage" class="print-image" src="" alt="">
     </div>
 
@@ -570,7 +566,10 @@
                 </td>
                 <td class="actions-cell">
                     <div class="action-buttons">
-                        <button class="action-btn print-btn" onclick="printImage('${image.imageData}', '${image.filename}', '${dateString}')">
+                        <button class="action-btn download-btn" onclick="downloadImage('${image.imageData}', '${image.filename}')">
+                            Download
+                        </button>
+                        <button class="action-btn print-btn" onclick="printImage('${image.imageData}', '${image.filename}')">
                             Print
                         </button>
                         <button class="action-btn delete-btn" onclick="deleteImage('${image.id}', '${image.filename}')">
@@ -596,17 +595,30 @@
             modal.style.display = 'none';
         }
 
-        function printImage(imageData, filename, dateString) {
+        function downloadImage(imageData, filename) {
+            try {
+                // Create a temporary link element
+                const link = document.createElement('a');
+                link.download = filename;
+                link.href = imageData;
+                
+                // Append to body, click, and remove
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (error) {
+                console.error('Error downloading image:', error);
+                alert('Error downloading image. Please try again.');
+            }
+        }
+
+        function printImage(imageData, filename) {
             // Set up the print content
             const printImage = document.getElementById('printImage');
-            const printFilename = document.getElementById('printFilename');
-            const printDate = document.getElementById('printDate');
             const printContainer = document.getElementById('printContainer');
             
             printImage.src = imageData;
             printImage.alt = filename;
-            printFilename.textContent = filename;
-            printDate.textContent = `Printed on: ${new Date().toLocaleDateString()} | Image date: ${dateString}`;
             
             // Show the print container temporarily
             printContainer.style.display = 'block';
