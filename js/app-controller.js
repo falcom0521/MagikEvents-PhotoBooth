@@ -222,6 +222,47 @@ class AppController {
     }
 
     /**
+     * Download the final image (iPad-friendly fallback)
+     */
+    downloadImage() {
+        try {
+            const canvas = document.getElementById('compositeCanvas');
+            if (!canvas || !canvas.width || !canvas.height) {
+                alert('No image available to download. Please create the final image first.');
+                return;
+            }
+
+            // Use PNG for lossless by default
+            const dataUrl = canvas.toDataURL('image/png');
+
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+            if (isIOS) {
+                // iOS Safari does not respect download attribute; open in new tab
+                const newWindow = window.open('', '_blank');
+                if (newWindow) {
+                    newWindow.document.write('<html><head><title>Download Image</title></head><body style="margin:0;display:flex;align-items:center;justify-content:center;background:#000;"><img src="' + dataUrl + '" style="max-width:100%;max-height:100%;object-fit:contain;"/></body></html>');
+                    newWindow.document.close();
+                } else {
+                    // Popup blocked: fallback to navigating current tab
+                    window.location.href = dataUrl;
+                }
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = `photobooth_${Date.now()}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (error) {
+            console.error('Download failed:', error);
+            alert('Could not download image. Please try again.');
+        }
+    }
+
+    /**
      * Start over with new photo
      */
     startOver() {

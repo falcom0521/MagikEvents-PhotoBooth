@@ -11,38 +11,38 @@
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #ffffff;
+    background: #f7f7f8;
     min-height: 100vh;
     padding: 20px;
-    color: #1a1a1a;
+    color: #111111;
     line-height: 1.6;
 }
 
 /* Container and Layout */
 .container {
-    max-width: 800px;
+    max-width: 780px;
     margin: 0 auto;
     background: #ffffff;
     border-radius: 12px;
-    padding: 40px;
-    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e5e5e5;
+    padding: 28px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e5e7eb;
 }
 
 /* Typography */
 h1 {
     text-align: center;
-    color: #1a1a1a;
-    margin-bottom: 40px;
-    font-size: 2.2rem;
+    color: #111111;
+    margin-bottom: 24px;
+    font-size: 1.75rem;
     font-weight: 600;
     letter-spacing: -0.02em;
 }
 
 h2 {
-    color: #1a1a1a;
-    margin-bottom: 20px;
-    font-size: 1.5rem;
+    color: #111111;
+    margin-bottom: 16px;
+    font-size: 1.25rem;
     text-align: center;
 }
 
@@ -74,21 +74,22 @@ h2 {
 
 .camera-video {
     width: 100%;
-    max-width: 400px;
-    height: 300px;
-    border-radius: 20px;
-    background: #f8f9fa;
-    margin: 20px 0;
+    max-width: 360px;
+    aspect-ratio: 3 / 4;
+    height: auto;
+    border-radius: 12px;
+    background: #ffffff;
+    margin: 16px auto;
     object-fit: cover;
-    border: 2px solid #dee2e6;
+    border: 1px solid #e5e7eb;
 }
 
 .camera-controls {
-    margin: 30px 0;
+    margin: 20px 0;
 }
 
 .camera-switch-container {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
@@ -96,93 +97,90 @@ h2 {
 }
 
 .camera-switch-btn {
-    padding: 12px 24px;
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
-    border: none;
-    border-radius: 25px;
+    padding: 10px 14px;
+    background: #ffffff;
+    color: #111111;
+    border: 1px solid #d0d5dd;
+    border-radius: 22px;
     cursor: pointer;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 500;
-    transition: all 0.3s ease;
-    display: flex;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
-    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+    box-shadow: none;
 }
 
 .camera-switch-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
-    background: linear-gradient(135deg, #0056b3, #004085);
+    background: #f2f4f7;
+    border-color: #c3c8d0;
 }
 
 .camera-switch-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 10px rgba(0, 123, 255, 0.3);
+    background: #eceff3;
 }
 
 .camera-switch-btn:disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
-    transform: none;
-    background: linear-gradient(135deg, #6c757d, #5a6268);
+    background: #f8f9fb;
 }
 
 .shutter-btn {
-    width: 80px;
-    height: 80px;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #dc3545, #e83e8c);
-    border: 6px solid white;
+    background: #ffffff;
+    border: 2px solid #111111;
     cursor: pointer;
-    margin: 0 auto 20px;
+    margin: 0 auto 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 2rem;
-    color: white;
-    transition: all 0.3s ease;
-    box-shadow: 0 10px 30px rgba(220, 53, 69, 0.3);
+    font-size: 1.25rem;
+    color: #111111;
+    transition: transform 0.15s ease, background-color 0.2s ease;
+    box-shadow: none;
 }
 
 .shutter-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 15px 40px rgba(220, 53, 69, 0.4);
+    transform: scale(1.04);
+    background: #f9fafb;
 }
 
 .shutter-btn:active {
-    transform: scale(0.95);
+    transform: scale(0.98);
 }
 
 .gallery-option {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 2px solid #dee2e6;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
 }
 
 .gallery-option p {
-    color: #6c757d;
+    color: #6b7280;
 }
 
 .gallery-btn {
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: white;
-    border: none;
-    padding: 12px 25px;
-    border-radius: 25px;
+    background: #ffffff;
+    color: #111111;
+    border: 1px solid #d0d5dd;
+    padding: 10px 14px;
+    border-radius: 10px;
     cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    display: flex;
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+    display: inline-flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     margin: 0 auto;
 }
 
 .gallery-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    background: #f2f4f7;
+    border-color: #c3c8d0;
 }
 
 .file-input {
@@ -190,14 +188,14 @@ h2 {
 }
 
 .camera-error {
-    color: #dc3545;
+    color: #b91c1c;
     text-align: center;
-    padding: 20px;
-    font-size: 1.1rem;
-    background: rgba(220, 53, 69, 0.1);
-    border-radius: 10px;
-    margin: 20px 0;
-    border: 1px solid rgba(220, 53, 69, 0.3);
+    padding: 16px;
+    font-size: 1rem;
+    background: #fef2f2;
+    border-radius: 8px;
+    margin: 16px 0;
+    border: 1px solid #fee2e2;
 }
 
 /* Controls Section */
@@ -209,12 +207,12 @@ h2 {
     position: relative;
     width: 300px;
     height: 400px;
-    border: 3px solid #667eea;
-    border-radius: 15px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
     overflow: hidden;
     margin: 0 auto 30px;
-    background: #f8f9fa;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    box-shadow: none;
 }
 
 .background-preview-image {
@@ -224,33 +222,33 @@ h2 {
 }
 
 .preview-label {
-    margin-top: 15px;
-    font-size: 1rem;
-    color: #6c757d;
+    margin-top: 12px;
+    font-size: 0.95rem;
+    color: #6b7280;
     font-weight: 500;
 }
 
 .zoom-controls {
-    background: rgba(248, 249, 250, 0.9);
-    padding: 25px;
-    border-radius: 20px;
-    border: 2px solid #667eea;
-    margin: 30px 0;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    background: #f9fafb;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    margin: 20px 0;
+    box-shadow: none;
 }
 
 .zoom-controls h3 {
     text-align: center;
-    margin-bottom: 25px;
-    color: #343a40;
-    font-size: 1.4rem;
+    margin-bottom: 16px;
+    color: #111111;
+    font-size: 1.1rem;
 }
 
 .controls-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 25px;
-    margin-bottom: 25px;
+    gap: 16px;
+    margin-bottom: 12px;
 }
 
 .control-group {
@@ -259,17 +257,17 @@ h2 {
 
 .control-group label {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     font-weight: 600;
-    color: #343a40;
-    font-size: 1rem;
+    color: #111111;
+    font-size: 0.95rem;
 }
 
 .control-slider {
     width: 100%;
-    height: 8px;
+    height: 6px;
     border-radius: 4px;
-    background: #dee2e6;
+    background: #e5e7eb;
     outline: none;
     -webkit-appearance: none;
     appearance: none;
@@ -279,40 +277,40 @@ h2 {
 .control-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: #111111;
     cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: none;
 }
 
 .control-slider::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: #111111;
     cursor: pointer;
     border: none;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    box-shadow: none;
 }
 
 .button-row {
     display: flex;
     justify-content: center;
     gap: 15px;
-    margin: 30px 0;
+    margin: 20px 0;
     flex-wrap: wrap;
 }
 
 /* Buttons */
 .btn {
-    padding: 15px 30px;
-    border: none;
-    border-radius: 30px;
-    font-size: 1.2rem;
+    padding: 12px 16px;
+    border: 1px solid #d0d5dd;
+    border-radius: 10px;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
     text-decoration: none;
     display: inline-flex;
     align-items: center;
@@ -320,52 +318,51 @@ h2 {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #28a745, #20c997);
-    color: white;
+    background: #111111;
+    color: #ffffff;
 }
 
 .btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px rgba(40, 167, 69, 0.3);
+    background: #1f2937;
+    border-color: #1f2937;
 }
 
 .btn-secondary {
-    background: linear-gradient(135deg, #fd7e14, #e63946);
-    color: white;
+    background: #ffffff;
+    color: #111111;
+    border-color: #d0d5dd;
 }
 
 .btn-secondary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 30px rgba(253, 126, 20, 0.3);
+    background: #f2f4f7;
+    border-color: #c3c8d0;
 }
 
 .btn-outline {
-    background: #f5f5f5;
-    color: #1a1a1a;
-    border: 1px solid #e5e5e5;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 1rem;
+    background: #ffffff;
+    color: #111111;
+    border: 1px solid #e5e7eb;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.95rem;
     font-weight: 500;
 }
 
 .btn-outline:hover {
-    background: #e5e5e5;
-    transform: translateY(-1px);
+    background: #f2f4f7;
 }
 
 .btn-dark {
-    background: #1a1a1a;
+    background: #111111;
     color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 1rem;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 0.95rem;
     font-weight: 500;
 }
 
 .btn-dark:hover {
-    background: #333333;
-    transform: translateY(-1px);
+    background: #1f2937;
 }
 
 /* Result Section */
@@ -378,49 +375,62 @@ h2 {
     max-width: 90%;
     height: 450px;
     object-fit: cover;
-    border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-    margin: 30px auto;
-    border: 4px solid #667eea;
+    border-radius: 12px;
+    box-shadow: none;
+    margin: 20px auto;
+    border: 1px solid #e5e7eb;
+}
+
+/* Final actions: uniform button sizing */
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.action-buttons .btn {
+    min-width: 140px;
+    justify-content: center;
 }
 
 /* Upload Status */
 .upload-status {
-    background: rgba(248, 249, 250, 0.9);
-    border-radius: 15px;
-    padding: 20px;
-    border: 1px solid #dee2e6;
-    margin-top: 20px;
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    margin-top: 16px;
     text-align: center;
     display: none;
 }
 
 .upload-message {
-    color: #343a40;
+    color: #111111;
     font-weight: 500;
-    font-size: 1.1rem;
-    margin-bottom: 10px;
+    font-size: 1rem;
+    margin-bottom: 8px;
 }
 
 .upload-message.success {
-    color: #28a745;
+    color: #166534;
 }
 
 .upload-message.error {
-    color: #dc3545;
+    color: #b91c1c;
 }
 
 .upload-progress {
     width: 100%;
-    background: #e9ecef;
-    border-radius: 10px;
+    background: #e5e7eb;
+    border-radius: 6px;
     height: 6px;
     overflow: hidden;
 }
 
 .upload-progress-bar {
     height: 100%;
-    background: linear-gradient(135deg, #28a745, #20c997);
+    background: #111111;
     width: 0%;
     transition: width 0.3s ease;
 }
@@ -439,16 +449,17 @@ h2 {
 /* Responsive Design */
 @media (max-width: 768px) {
     .container {
-        padding: 20px;
+        padding: 16px;
     }
 
     h1 {
-        font-size: 2rem;
+        font-size: 1.5rem;
     }
 
     .camera-video {
         max-width: 100%;
-        height: 250px;
+        aspect-ratio: 3 / 4;
+        height: auto;
     }
 
     .camera-switch-container {
@@ -458,14 +469,14 @@ h2 {
     }
 
     .camera-switch-btn {
-        min-width: 150px;
+        min-width: 140px;
         font-size: 0.9rem;
-        padding: 10px 20px;
+        padding: 10px 14px;
     }
 
     .background-preview-container {
-        width: 250px;
-        height: 350px;
+        width: 240px;
+        height: 320px;
     }
 
     .controls-grid {
@@ -478,6 +489,6 @@ h2 {
     }
 
     .btn {
-        width: 250px;
+        width: 240px;
     }
 }

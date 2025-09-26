@@ -27,13 +27,13 @@
                     <canvas id="captureCanvas" style="display: none;"></canvas>
                     
                     <div class="camera-controls">
-                        <div class="camera-switch-container" id="cameraSwitchContainer">
-                            <!-- Camera buttons will be populated dynamically -->
-                        </div>
-                        
                         <button class="shutter-btn" onclick="window.appController.capturePhoto()">
                             📸
                         </button>
+
+                        <div class="camera-switch-container" id="cameraSwitchContainer">
+                            <!-- Camera buttons will be populated dynamically -->
+                        </div>
                     </div>
 
                     <div class="gallery-option">
@@ -103,6 +103,9 @@
                         </button>
                         <button class="btn btn-dark" onclick="window.appController.saveImage()" id="saveBtn">
                             💾 Save Image
+                        </button>
+                        <button class="btn btn-primary" onclick="window.appController.downloadImage()" id="downloadBtn">
+                            ⬇️ Download
                         </button>
                         <button class="btn btn-outline" onclick="window.appController.startOver()">
                             🆕 Take New Photo
