@@ -17,19 +17,49 @@ class ImageProcessor {
      * @returns {Promise<void>}
      */
     async loadTargetImage() {
-        return new Promise((resolve, reject) => {
-            const img = new Image();
-            img.onload = () => {
-                this.targetImage = img;
-                resolve();
-            };
-            img.onerror = () => {
-                // Create a high-quality frame if frame.png is not found
-                this.createDefaultFrame();
-                resolve();
-            };
-            img.src = './frame.png';
-        });
+        try {
+            // First, try to load from Firebase
+            const frameDataUrl = await window.dataManager.loadActiveFrameImage();
+            
+            if (frameDataUrl) {
+                // Load frame from Firebase
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        this.targetImage = img;
+                        console.log('Frame loaded from Firebase');
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        console.log('Error loading frame from Firebase, using default');
+                        this.createDefaultFrame();
+                        resolve();
+                    };
+                    img.src = frameDataUrl;
+                });
+            } else {
+                // Fallback to local frame.png
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        this.targetImage = img;
+                        console.log('Frame loaded from local file');
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        // Create a high-quality frame if frame.png is not found
+                        this.createDefaultFrame();
+                        resolve();
+                    };
+                    img.src = './frame.png';
+                });
+            }
+        } catch (error) {
+            console.error('Error loading target image:', error);
+            // Fallback to default frame
+            this.createDefaultFrame();
+            return Promise.resolve();
+        }
     }
 
     /**

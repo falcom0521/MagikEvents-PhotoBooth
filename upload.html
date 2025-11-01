@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MagikEvents - Upload Frame</title>
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/upload.css">
+    
+    <!-- Firebase Configuration -->
+    <script src="js/firebase-config.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1>Upload Frame Image</h1>
+                <div class="header-actions">
+                    <a href="index.html" class="btn btn-outline">Back to PhotoBooth</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="upload-content">
+            <!-- Upload Section -->
+            <section class="upload-section">
+                <h2>Upload New Frame</h2>
+                <p class="section-description">
+                    Upload a new frame image to replace the current one. The frame should be a transparent PNG for best results.
+                </p>
+                
+                <div class="upload-area">
+                    <input type="file" id="frameInput" class="file-input" accept="image/png,image/jpeg,image/jpg">
+                    <div class="upload-placeholder" id="uploadPlaceholder">
+                        <div class="upload-icon">📁</div>
+                        <p>Click to select an image</p>
+                        <p class="upload-hint">or drag and drop</p>
+                    </div>
+                    <img id="previewImage" class="preview-image" style="display: none;">
+                </div>
+
+                <div class="upload-actions">
+                    <button class="btn btn-secondary" id="cancelBtn" style="display: none;" onclick="window.uploadController.clearSelection()">
+                        Cancel
+                    </button>
+                    <button class="btn btn-primary" id="uploadBtn" style="display: none;" onclick="window.uploadController.uploadFrame()">
+                        Upload Frame
+                    </button>
+                </div>
+            </section>
+
+            <!-- Current Frame Preview -->
+            <section class="preview-section">
+                <h2>Current Active Frame</h2>
+                <p class="section-description">
+                    This is the frame currently being used in the PhotoBooth application.
+                </p>
+                
+                <div id="loadingCurrent" class="loading-message">
+                    Loading current frame...
+                </div>
+                
+                <div id="currentFrameContainer" style="display: none;">
+                    <img id="currentFrameImage" class="current-frame-image">
+                </div>
+                
+                <div id="noCurrentFrame" class="no-frame-message" style="display: none;">
+                    <p>No active frame set. Using default frame.</p>
+                </div>
+            </section>
+
+            <!-- Upload Status -->
+            <div id="uploadStatus" class="upload-status" style="display: none;">
+                <p id="uploadMessage" class="upload-message"></p>
+                <div id="uploadProgress" class="upload-progress">
+                    <div id="uploadProgressBar" class="upload-progress-bar"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript Modules -->
+    <script src="js/data-manager.js"></script>
+    <script src="js/upload-controller.js"></script>
+</body>
+</html>

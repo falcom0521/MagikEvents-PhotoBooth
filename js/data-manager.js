@@ -188,6 +188,128 @@ class DataManager {
     }
 
     /**
+     * Save frame image to database
+     * @param {string} imageDataUrl - Base64 image data
+     * @returns {Promise<string>} Frame ID
+     */
+    async saveFrameImage(imageDataUrl) {
+        if (!this.isInitialized) {
+            throw new Error('Data manager not initialized');
+        }
+
+        try {
+            const { ref, push, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+            
+            // Prepare frame data
+            const frameData = {
+                imageData: imageDataUrl,
+                uploadedAt: serverTimestamp(),
+                type: 'frame',
+                active: true
+            };
+
+            // Save to Firebase Realtime Database in frame-images collection
+            const framesRef = ref(this.database, 'frame-images');
+            
+            // First, deactivate all existing frames
+            const allFramesRef = ref(this.database, 'frame-images');
+            const { get, child } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+            const snapshot = await get(allFramesRef);
+            
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const { update } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+                const updates = {};
+                Object.keys(data).forEach(key => {
+                    updates[`frame-images/${key}/active`] = false;
+                });
+                await update(ref(this.database), updates);
+            }
+            
+            // Push new frame
+            const result = await push(framesRef, frameData);
+            
+            console.log('Frame image saved successfully:', result.key);
+            return result.key;
+            
+        } catch (error) {
+            console.error('Error saving frame image:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Load active frame image from database
+     * @returns {Promise<string|null>} Base64 image data or null
+     */
+    async loadActiveFrameImage() {
+        if (!this.isInitialized) {
+            throw new Error('Data manager not initialized');
+        }
+
+        try {
+            const { ref, get, query, orderByChild, equalTo, limitToFirst } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+            
+            const framesRef = ref(this.database, 'frame-images');
+            const activeFramesQuery = query(framesRef, orderByChild('active'), equalTo(true), limitToFirst(1));
+            
+            const snapshot = await get(activeFramesQuery);
+            
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const frameKey = Object.keys(data)[0];
+                const frameData = data[frameKey];
+                console.log('Active frame loaded from database:', frameKey);
+                return frameData.imageData;
+            } else {
+                console.log('No active frame found in database, using default');
+                return null;
+            }
+            
+        } catch (error) {
+            console.error('Error loading active frame image:', error);
+            // Return null to fallback to default frame
+            return null;
+        }
+    }
+
+    /**
+     * Get current active frame preview
+     * @param {Function} callback - Callback function for real-time updates
+     * @returns {Promise<void>}
+     */
+    async getActiveFramePreview(callback) {
+        if (!this.isInitialized) {
+            throw new Error('Data manager not initialized');
+        }
+
+        try {
+            const { ref, onValue, query, orderByChild, equalTo, limitToFirst } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+            
+            const framesRef = ref(this.database, 'frame-images');
+            const activeFramesQuery = query(framesRef, orderByChild('active'), equalTo(true), limitToFirst(1));
+            
+            onValue(activeFramesQuery, (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const frameKey = Object.keys(data)[0];
+                    const frameData = data[frameKey];
+                    callback(frameData.imageData);
+                } else {
+                    callback(null);
+                }
+            }, (error) => {
+                console.error('Error getting active frame preview:', error);
+                callback(null);
+            });
+            
+        } catch (error) {
+            console.error('Error setting up frame preview listener:', error);
+            throw error;
+        }
+    }
+
+    /**
      * Check if data manager is ready
      * @returns {boolean} Ready status
      */
