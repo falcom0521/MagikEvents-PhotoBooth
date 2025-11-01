@@ -327,6 +327,39 @@ class GalleryController {
     }
 
     /**
+     * Delete all images using existing delete functionality
+     * @returns {Promise<void>}
+     */
+    async deleteAllImages() {
+        const imageCount = this.allImages.length;
+        if (imageCount === 0) {
+            alert('No images to delete.');
+            return;
+        }
+
+        const message = `Are you sure you want to delete ALL ${imageCount} image${imageCount !== 1 ? 's' : ''}? This action cannot be undone.`;
+        if (!confirm(message)) {
+            return;
+        }
+
+        // Double confirmation for safety
+        if (!confirm('This is your last chance. Are you absolutely sure you want to delete ALL images?')) {
+            return;
+        }
+
+        try {
+            // Delete each image using existing deleteImage functionality
+            for (const image of this.allImages) {
+                await window.dataManager.deleteImage(image.id);
+            }
+            console.log('All images deleted successfully');
+        } catch (error) {
+            console.error('Error deleting all images:', error);
+            alert(`Error deleting all images: ${error.message}`);
+        }
+    }
+
+    /**
      * Setup event listeners
      */
     setupEventListeners() {
