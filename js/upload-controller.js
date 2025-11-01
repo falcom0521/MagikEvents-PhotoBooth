@@ -7,6 +7,7 @@ class UploadController {
     constructor() {
         this.selectedImage = null;
         this.isInitialized = false;
+        this.isProcessing = false;
     }
 
     /**
@@ -43,12 +44,20 @@ class UploadController {
         const fileInput = document.getElementById('frameInput');
         const uploadArea = document.querySelector('.upload-area');
         
-        // Click to upload
-        uploadArea.addEventListener('click', () => {
-            fileInput.click();
+        // Prevent clicks on file input from bubbling to upload area
+        fileInput.addEventListener('click', (e) => {
+            e.stopPropagation();
         });
         
-        // File input change
+        // Click to upload (only if clicking on the placeholder area, not the input)
+        uploadArea.addEventListener('click', (e) => {
+            // Only trigger if not clicking directly on the file input
+            if (e.target !== fileInput && !fileInput.contains(e.target)) {
+                fileInput.click();
+            }
+        });
+        
+        // File input change - only process once
         fileInput.addEventListener('change', (e) => {
             this.handleFileSelect(e);
         });
@@ -90,14 +99,25 @@ class UploadController {
      * @param {Event} event - File input event
      */
     handleFileSelect(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        
-        if (!file.type.startsWith('image/')) {
-            alert('Please select an image file');
+        // Prevent duplicate processing
+        if (this.isProcessing) {
             return;
         }
         
+        const file = event.target.files[0];
+        if (!file) {
+            // Reset input if no file selected (user cancelled)
+            event.target.value = '';
+            return;
+        }
+        
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file');
+            event.target.value = '';
+            return;
+        }
+        
+        this.isProcessing = true;
         this.processFile(file);
     }
 
@@ -111,10 +131,17 @@ class UploadController {
         reader.onload = (e) => {
             this.selectedImage = e.target.result;
             this.showPreview();
+            this.isProcessing = false;
         };
         
         reader.onerror = () => {
             alert('Error reading file. Please try again.');
+            this.isProcessing = false;
+            // Reset input on error
+            const fileInput = document.getElementById('frameInput');
+            if (fileInput) {
+                fileInput.value = '';
+            }
         };
         
         reader.readAsDataURL(file);
@@ -141,6 +168,7 @@ class UploadController {
      */
     clearSelection() {
         this.selectedImage = null;
+        this.isProcessing = false;
         
         const uploadPlaceholder = document.getElementById('uploadPlaceholder');
         const previewImage = document.getElementById('previewImage');
