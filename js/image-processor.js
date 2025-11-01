@@ -199,6 +199,40 @@ class ImageProcessor {
     setupBackgroundControls() {
         if (!this.backgroundImage) return;
         
+        // Display target image if available
+        const targetImg = document.getElementById('targetImagePreview');
+        if (this.targetImage && targetImg) {
+            // The targetImage is an Image object - convert it to data URL for display
+            if (this.targetImage.complete && this.targetImage.width > 0) {
+                // Image is already loaded, convert to data URL via canvas
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = this.targetImage.width;
+                canvas.height = this.targetImage.height;
+                ctx.drawImage(this.targetImage, 0, 0);
+                targetImg.src = canvas.toDataURL('image/png');
+                targetImg.style.display = 'block';
+            } else if (this.targetImage.src) {
+                // Image is still loading, wait for it and then convert
+                const handleLoad = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = this.targetImage.width;
+                    canvas.height = this.targetImage.height;
+                    ctx.drawImage(this.targetImage, 0, 0);
+                    targetImg.src = canvas.toDataURL('image/png');
+                    targetImg.style.display = 'block';
+                };
+                if (this.targetImage.complete) {
+                    handleLoad();
+                } else {
+                    this.targetImage.addEventListener('load', handleLoad, { once: true });
+                    // Fallback: use src directly if load event doesn't fire
+                    targetImg.src = this.targetImage.src;
+                }
+            }
+        }
+        
         const previewImg = document.getElementById('backgroundPreviewImage');
         previewImg.src = this.backgroundImage.src;
         previewImg.style.display = 'block';
