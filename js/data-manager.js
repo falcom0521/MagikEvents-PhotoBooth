@@ -248,23 +248,52 @@ class DataManager {
         }
 
         try {
-            const { ref, get, query, orderByChild, equalTo, limitToFirst } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+            const { ref, get } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
             
             const framesRef = ref(this.database, 'frame-images');
-            const activeFramesQuery = query(framesRef, orderByChild('active'), equalTo(true), limitToFirst(1));
-            
-            const snapshot = await get(activeFramesQuery);
+            const snapshot = await get(framesRef);
             
             if (snapshot.exists()) {
                 const data = snapshot.val();
-                const frameKey = Object.keys(data)[0];
-                const frameData = data[frameKey];
-                console.log('Active frame loaded from database:', frameKey);
-                return frameData.imageData;
-            } else {
-                console.log('No active frame found in database, using default');
-                return null;
+                // Find the active frame manually (more reliable than query)
+                let activeFrame = null;
+                let activeFrameKey = null;
+                
+                // First, try to find a frame with active: true
+                Object.keys(data).forEach(key => {
+                    if (data[key].active === true) {
+                        activeFrame = data[key];
+                        activeFrameKey = key;
+                    }
+                });
+                
+                // If no active frame found, use the most recent one (by upload time)
+                if (!activeFrame) {
+                    let mostRecent = null;
+                    let mostRecentKey = null;
+                    let mostRecentTime = 0;
+                    
+                    Object.keys(data).forEach(key => {
+                        const uploadTime = data[key].uploadedAt || 0;
+                        if (uploadTime > mostRecentTime) {
+                            mostRecentTime = uploadTime;
+                            mostRecent = data[key];
+                            mostRecentKey = key;
+                        }
+                    });
+                    
+                    activeFrame = mostRecent;
+                    activeFrameKey = mostRecentKey;
+                }
+                
+                if (activeFrame) {
+                    console.log('Active frame loaded from database:', activeFrameKey);
+                    return activeFrame.imageData;
+                }
             }
+            
+            console.log('No active frame found in database, using default');
+            return null;
             
         } catch (error) {
             console.error('Error loading active frame image:', error);
@@ -284,17 +313,40 @@ class DataManager {
         }
 
         try {
-            const { ref, onValue, query, orderByChild, equalTo, limitToFirst } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
+            const { ref, onValue } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js');
             
             const framesRef = ref(this.database, 'frame-images');
-            const activeFramesQuery = query(framesRef, orderByChild('active'), equalTo(true), limitToFirst(1));
             
-            onValue(activeFramesQuery, (snapshot) => {
+            onValue(framesRef, (snapshot) => {
                 if (snapshot.exists()) {
                     const data = snapshot.val();
-                    const frameKey = Object.keys(data)[0];
-                    const frameData = data[frameKey];
-                    callback(frameData.imageData);
+                    // Find the active frame manually
+                    let activeFrame = null;
+                    
+                    // First, try to find a frame with active: true
+                    Object.keys(data).forEach(key => {
+                        if (data[key].active === true) {
+                            activeFrame = data[key];
+                        }
+                    });
+                    
+                    // If no active frame found, use the most recent one
+                    if (!activeFrame) {
+                        let mostRecent = null;
+                        let mostRecentTime = 0;
+                        
+                        Object.keys(data).forEach(key => {
+                            const uploadTime = data[key].uploadedAt || 0;
+                            if (uploadTime > mostRecentTime) {
+                                mostRecentTime = uploadTime;
+                                mostRecent = data[key];
+                            }
+                        });
+                        
+                        activeFrame = mostRecent;
+                    }
+                    
+                    callback(activeFrame ? activeFrame.imageData : null);
                 } else {
                     callback(null);
                 }

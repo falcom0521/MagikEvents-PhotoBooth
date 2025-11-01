@@ -284,6 +284,23 @@ class AppController {
     handleVisibilityChange() {
         if (document.hidden && window.cameraManager.stream) {
             window.cameraManager.stopCamera();
+        } else if (!document.hidden) {
+            // When page becomes visible again, reload frame in case it was updated
+            this.reloadFrameIfNeeded();
+        }
+    }
+
+    /**
+     * Reload frame image if needed (when returning from upload page)
+     */
+    async reloadFrameIfNeeded() {
+        try {
+            // Only reload if we're not in the middle of processing
+            if (this.currentStep === 1) {
+                await window.imageProcessor.reloadFrameImage();
+            }
+        } catch (error) {
+            console.error('Error reloading frame:', error);
         }
     }
 
@@ -294,6 +311,11 @@ class AppController {
         // Page visibility change
         document.addEventListener('visibilitychange', () => {
             this.handleVisibilityChange();
+        });
+
+        // Window focus event - reload frame when user returns to the page
+        window.addEventListener('focus', () => {
+            this.reloadFrameIfNeeded();
         });
 
         // Global error handling

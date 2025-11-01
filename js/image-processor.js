@@ -18,7 +18,7 @@ class ImageProcessor {
      */
     async loadTargetImage() {
         try {
-            // First, try to load from Firebase
+            // Load frame from Firebase only
             const frameDataUrl = await window.dataManager.loadActiveFrameImage();
             
             if (frameDataUrl) {
@@ -31,39 +31,29 @@ class ImageProcessor {
                         resolve();
                     };
                     img.onerror = () => {
-                        console.log('Error loading frame from Firebase, using default');
+                        console.error('Error loading frame from Firebase, creating default placeholder');
+                        // Fall back to default frame instead of rejecting
                         this.createDefaultFrame();
                         resolve();
                     };
                     img.src = frameDataUrl;
                 });
             } else {
-                // Fallback to local frame.png
-                return new Promise((resolve, reject) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        this.targetImage = img;
-                        console.log('Frame loaded from local file');
-                        resolve();
-                    };
-                    img.onerror = () => {
-                        // Create a high-quality frame if frame.png is not found
-                        this.createDefaultFrame();
-                        resolve();
-                    };
-                    img.src = './frame.png';
-                });
+                // No frame in Firebase - create a default placeholder
+                console.log('No active frame in Firebase, creating default placeholder');
+                this.createDefaultFrame();
+                return Promise.resolve();
             }
         } catch (error) {
             console.error('Error loading target image:', error);
-            // Fallback to default frame
+            // Create a default placeholder frame
             this.createDefaultFrame();
             return Promise.resolve();
         }
     }
 
     /**
-     * Create default frame if frame.png is not available
+     * Create default placeholder frame if no frame is available in Firebase
      */
     createDefaultFrame() {
         const canvas = document.createElement('canvas');
@@ -87,7 +77,11 @@ class ImageProcessor {
         ctx.lineWidth = Math.floor(frameThickness * 0.2);
         ctx.strokeRect(frameThickness, frameThickness, innerWidth, innerHeight);
         
+        // Create and load the default frame image
         this.targetImage = new Image();
+        this.targetImage.onload = () => {
+            console.log('Default placeholder frame created and loaded');
+        };
         this.targetImage.src = canvas.toDataURL('image/png');
     }
 
@@ -263,6 +257,8 @@ class ImageProcessor {
         ctx.imageSmoothingQuality = 'high';
         
         console.log(`Processing at ${canvas.width}x${canvas.height} resolution`);
+        console.log(`Target image: ${this.targetImage ? 'loaded' : 'missing'} (${this.targetImage?.width}x${this.targetImage?.height})`);
+        console.log(`Background image: ${this.backgroundImage ? 'loaded' : 'missing'} (${this.backgroundImage?.width}x${this.backgroundImage?.height})`);
         
         // Calculate scaling and positioning for high resolution
         const scaleX = canvas.width / this.backgroundImage.width;
@@ -289,6 +285,8 @@ class ImageProcessor {
         ctx.drawImage(this.targetImage, 0, 0, canvas.width, canvas.height);
         
         console.log('Final composite created at maximum quality');
+        console.log('Composite canvas dimensions:', canvas.width, 'x', canvas.height);
+        
         return canvas.toDataURL('image/png');
     }
 
@@ -310,6 +308,22 @@ class ImageProcessor {
      */
     isReady() {
         return this.targetImage !== null && this.backgroundImage !== null;
+    }
+
+    /**
+     * Reload frame image from Firebase (call this after uploading a new frame)
+     * @returns {Promise<void>}
+     */
+    async reloadFrameImage() {
+        try {
+            console.log('Reloading frame image from Firebase...');
+            await this.loadTargetImage();
+            console.log('Frame image reloaded successfully');
+        } catch (error) {
+            console.error('Error reloading frame image:', error);
+            // Fallback to default if reload fails
+            this.createDefaultFrame();
+        }
     }
 }
 
