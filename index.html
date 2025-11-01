@@ -12,6 +12,14 @@
     <script src="js/firebase-config.js"></script>
 </head>
 <body>
+    <!-- Initialization Loader -->
+    <div id="initLoader" class="init-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-text">Connecting to Firebase...</p>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>MagikEvents PhotoBooth</h1>
@@ -19,7 +27,7 @@
 
         <main>
             <!-- Step 1: Camera Capture -->
-            <section class="step-section active" id="step1">
+            <section class="step-section" id="step1">
                 <div class="camera-section">
                     <h2>📷 Capture Your Photo</h2>
                     

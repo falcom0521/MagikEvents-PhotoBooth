@@ -10,6 +10,41 @@ class AppController {
     }
 
     /**
+     * Update loader message
+     * @param {string} message - Loader message
+     */
+    updateLoaderMessage(message) {
+        const loaderText = document.querySelector('.loader-text');
+        if (loaderText) {
+            loaderText.textContent = message;
+        }
+    }
+
+    /**
+     * Hide initialization loader
+     */
+    hideLoader() {
+        const loader = document.getElementById('initLoader');
+        if (loader) {
+            loader.classList.add('hidden');
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 300);
+        }
+    }
+
+    /**
+     * Show initialization loader
+     */
+    showLoader() {
+        const loader = document.getElementById('initLoader');
+        if (loader) {
+            loader.style.display = 'flex';
+            loader.classList.remove('hidden');
+        }
+    }
+
+    /**
      * Initialize the application
      * @returns {Promise<void>}
      */
@@ -17,17 +52,45 @@ class AppController {
         try {
             console.log('Initializing MagikEvents PhotoBooth...');
             
-            // Initialize all services
+            // Show loader
+            this.showLoader();
+            
+            // Initialize Firebase
+            this.updateLoaderMessage('Connecting to Firebase...');
             await window.firebaseService.initialize();
+            console.log('Firebase connected');
+            
+            // Initialize Data Manager
+            this.updateLoaderMessage('Initializing database...');
             await window.dataManager.initialize();
-            await window.cameraManager.initialize();
+            console.log('Data manager initialized');
+            
+            // Load target image from Firebase
+            this.updateLoaderMessage('Loading frame image...');
             await window.imageProcessor.loadTargetImage();
+            console.log('Target image loaded');
+            
+            // Initialize Camera Manager
+            this.updateLoaderMessage('Initializing camera...');
+            await window.cameraManager.initialize();
+            console.log('Camera manager initialized');
             
             this.isInitialized = true;
             console.log('Application initialized successfully');
             
+            // Hide loader and show step 1
+            this.hideLoader();
+            this.goToStep(1);
+            
         } catch (error) {
             console.error('Application initialization failed:', error);
+            // Update loader with error message
+            this.updateLoaderMessage('Failed to initialize. Please refresh the page.');
+            // Hide loader after delay to show error
+            setTimeout(() => {
+                this.hideLoader();
+                alert('Failed to initialize application. Please refresh the page.');
+            }, 2000);
             throw error;
         }
     }
@@ -134,19 +197,42 @@ class AppController {
     /**
      * Process images and create final result
      */
-    processImages() {
+    async processImages() {
         try {
-            const imageDataUrl = window.imageProcessor.processImages();
+            // Show loading state
+            const processBtn = document.querySelector('button[onclick*="processImages"]');
+            const originalText = processBtn ? processBtn.textContent : '';
+            if (processBtn) {
+                processBtn.disabled = true;
+                processBtn.textContent = '⏳ Processing...';
+            }
+            
+            const imageDataUrl = await window.imageProcessor.processImages();
             
             // Show final result
             const finalResult = document.getElementById('finalResult');
             finalResult.src = imageDataUrl;
             finalResult.style.display = 'block';
             
+            if (processBtn) {
+                processBtn.disabled = false;
+                processBtn.textContent = originalText;
+            }
+            
             this.goToStep(3);
         } catch (error) {
             console.error('Error processing images:', error);
-            alert('Error processing images. Please try again.');
+            
+            // Restore button state
+            const processBtn = document.querySelector('button[onclick*="processImages"]');
+            if (processBtn) {
+                processBtn.disabled = false;
+                processBtn.textContent = '✨ Create Final Image';
+            }
+            
+            // Show more specific error message
+            const errorMessage = error.message || 'Error processing images. Please try again.';
+            alert(errorMessage);
         }
     }
 
@@ -343,11 +429,13 @@ window.appController = new AppController();
 // Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
     try {
-        await window.appController.initialize();
+        // Setup event listeners first
         window.appController.setupEventListeners();
+        // Then initialize (which will show loader)
+        await window.appController.initialize();
         console.log('MagikEvents PhotoBooth is ready!');
     } catch (error) {
         console.error('Failed to initialize application:', error);
-        alert('Failed to initialize application. Please refresh the page.');
+        // Error handling is done in initialize() method
     }
 });
