@@ -68,8 +68,86 @@ h2 {
 }
 
 /* Camera Section */
+.capture-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+@media (min-width: 768px) {
+    .capture-layout {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+}
+
+.upload-section,
+.camera-section {
+    flex: 1;
+}
+
 .camera-section {
     text-align: center;
+}
+
+.upload-section h2 {
+    margin-bottom: 20px;
+}
+
+.drop-zone {
+    border: 2px dashed #d0d5dd;
+    border-radius: 16px;
+    padding: 36px 20px;
+    text-align: center;
+    background: #f9fafb;
+    transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+}
+
+.drop-zone:hover {
+    border-color: #111111;
+    background: #f3f4f6;
+}
+
+.drop-zone.is-dragover {
+    border-color: #111111;
+    background: #eef2ff;
+    transform: translateY(-2px);
+}
+
+.drop-zone-icon {
+    font-size: 1.8rem;
+    margin-bottom: 12px;
+}
+
+.drop-zone-title {
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin-bottom: 4px;
+    color: #111111;
+}
+
+.drop-zone-subtitle {
+    color: #6b7280;
+    font-size: 0.95rem;
+}
+
+.camera-placeholder {
+    color: #6b7280;
+    background: #f9fafb;
+    border: 1px dashed #d0d5dd;
+    border-radius: 12px;
+    padding: 18px;
+    margin: 16px auto;
+    max-width: 360px;
+}
+
+.camera-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 12px 0 20px;
+    flex-wrap: wrap;
 }
 
 .camera-video {

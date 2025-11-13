@@ -28,31 +28,45 @@
         <main>
             <!-- Step 1: Camera Capture -->
             <section class="step-section" id="step1">
-                <div class="camera-section">
-                    <h2>📷 Capture Your Photo</h2>
-                    
-                    <video id="cameraVideo" class="camera-video" autoplay playsinline></video>
-                    <canvas id="captureCanvas" style="display: none;"></canvas>
-                    
-                    <div class="camera-controls">
-                        <button class="shutter-btn" onclick="window.appController.capturePhoto()">
-                            📸
-                        </button>
-
-                        <div class="camera-switch-container" id="cameraSwitchContainer">
-                            <!-- Camera buttons will be populated dynamically -->
+                <div class="capture-layout">
+                    <div class="upload-section">
+                        <h2>📁 Upload Your Photo</h2>
+                        <div id="dropZone" class="drop-zone">
+                            <div class="drop-zone-icon">⬆️</div>
+                            <p class="drop-zone-title">Drag & drop your image here</p>
+                            <p class="drop-zone-subtitle">or click to browse files</p>
                         </div>
+                        <input type="file" id="backgroundInput" class="file-input" accept="image/*">
                     </div>
 
-                    <div class="gallery-option">
-                        <p>Or upload from gallery</p>
-                        <input type="file" id="backgroundInput" class="file-input" accept="image/*" onchange="window.appController.handleFileSelect(event)">
-                        <button class="gallery-btn" onclick="document.getElementById('backgroundInput').click()">
-                            📁 Choose from Gallery
-                        </button>
-                    </div>
+                    <div class="camera-section">
+                        <h2>📷 Prefer to take a photo?</h2>
+                        
+                        <p id="cameraPlaceholder" class="camera-placeholder">Camera is currently off. Click the button below to enable it.</p>
+                        <video id="cameraVideo" class="camera-video" playsinline muted style="display: none;"></video>
+                        <canvas id="captureCanvas" style="display: none;"></canvas>
+                        
+                        <div class="camera-actions">
+                            <button class="btn btn-secondary" id="startCameraBtn">
+                                🎥 Start Camera
+                            </button>
+                            <button class="btn btn-outline" id="stopCameraBtn" style="display: none;">
+                                ✖ Stop Camera
+                            </button>
+                        </div>
 
-                    <div id="cameraError" class="camera-error" style="display: none;"></div>
+                        <div class="camera-controls" id="cameraControls" style="display: none;">
+                            <button class="shutter-btn" onclick="window.appController.capturePhoto()">
+                                📸
+                            </button>
+
+                            <div class="camera-switch-container" id="cameraSwitchContainer">
+                                <!-- Camera buttons will be populated dynamically -->
+                            </div>
+                        </div>
+
+                        <div id="cameraError" class="camera-error" style="display: none;"></div>
+                    </div>
                 </div>
             </section>
 

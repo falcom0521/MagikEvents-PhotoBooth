@@ -31,7 +31,6 @@ class CameraManager {
     async initialize() {
         try {
             await this.setupCameraOptions();
-            await this.startCamera();
             this.isInitialized = true;
             console.log('Camera manager initialized successfully');
         } catch (error) {
@@ -137,6 +136,10 @@ class CameraManager {
         const video = document.getElementById('cameraVideo');
         const errorDiv = document.getElementById('cameraError');
         
+        if (!video) {
+            throw new Error('Camera element not found.');
+        }
+
         // Stop existing stream
         if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop());
@@ -164,6 +167,12 @@ class CameraManager {
             this.stream = await navigator.mediaDevices.getUserMedia(constraints);
             video.srcObject = this.stream;
             errorDiv.style.display = 'none';
+            
+            try {
+                await video.play();
+            } catch (playError) {
+                console.warn('Video playback could not start automatically:', playError);
+            }
             
             // Log actual video capabilities
             const track = this.stream.getVideoTracks()[0];
@@ -234,6 +243,12 @@ class CameraManager {
         if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop());
             this.stream = null;
+        }
+
+        const video = document.getElementById('cameraVideo');
+        if (video) {
+            video.pause();
+            video.srcObject = null;
         }
     }
 

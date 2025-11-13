@@ -111,6 +111,17 @@ class ImageProcessor {
         const file = event.target.files[0];
         if (!file) return;
 
+        await this.loadImageFromFile(file);
+    }
+
+    /**
+     * Load image from a file object
+     * @param {File} file
+     * @returns {Promise<void>}
+     */
+    async loadImageFromFile(file) {
+        if (!file) return;
+
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (e) => {

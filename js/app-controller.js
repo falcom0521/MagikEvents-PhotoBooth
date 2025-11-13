@@ -134,12 +134,8 @@ class AppController {
     /**
      * Setup camera step
      */
-    async setupCameraStep() {
-        try {
-            await window.cameraManager.startCamera();
-        } catch (error) {
-            console.error('Error setting up camera step:', error);
-        }
+    setupCameraStep() {
+        this.updateCameraUI(!!window.cameraManager.stream);
     }
 
     /**
@@ -176,13 +172,207 @@ class AppController {
      * @param {Event} event - File input event
      * @returns {Promise<void>}
      */
-    async handleFileSelect(event) {
+    async handleFileSelect(input) {
         try {
-            await window.imageProcessor.handleFileSelect(event);
+            let files = null;
+            
+            if (input instanceof Event) {
+                files = input.target && input.target.files ? input.target.files : null;
+            } else if (input && typeof input.length === 'number') {
+                files = input;
+            }
+
+            if (!files || files.length === 0) return;
+
+            const imageFile = Array.from(files).find(file => file.type.startsWith('image/'));
+            if (!imageFile) {
+                alert('Please select an image file.');
+                return;
+            }
+
+            await window.imageProcessor.loadImageFromFile(imageFile);
             this.goToStep(2);
+
+            if (input instanceof Event && input.target) {
+                input.target.value = '';
+            }
         } catch (error) {
             console.error('Error handling file select:', error);
             alert('Error loading image. Please try again.');
+        }
+    }
+
+    /**
+     * Handle files dropped into the drop zone
+     * @param {DragEvent} event
+     */
+    async handleFileDrop(event) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const dropZone = document.getElementById('dropZone');
+        if (dropZone) {
+            dropZone.classList.remove('is-dragover');
+        }
+
+        const files = event.dataTransfer ? event.dataTransfer.files : null;
+        if (!files || files.length === 0) return;
+
+        await this.handleFileSelect(files);
+    }
+
+    /**
+     * Start camera on demand
+     * @returns {Promise<void>}
+     */
+    async startCamera() {
+        const startBtn = document.getElementById('startCameraBtn');
+        const stopBtn = document.getElementById('stopCameraBtn');
+        const errorDiv = document.getElementById('cameraError');
+
+        try {
+            if (startBtn) {
+                startBtn.disabled = true;
+                startBtn.textContent = '🎥 Starting...';
+            }
+
+            if (!window.cameraManager.isInitialized) {
+                await window.cameraManager.initialize();
+            }
+
+            await window.cameraManager.startCamera();
+            this.updateCameraUI(true);
+
+            if (stopBtn) {
+                stopBtn.style.display = 'inline-flex';
+            }
+
+            if (startBtn) {
+                startBtn.textContent = '🔄 Restart Camera';
+            }
+
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+                errorDiv.textContent = '';
+            }
+        } catch (error) {
+            console.error('Error starting camera:', error);
+            if (errorDiv) {
+                errorDiv.textContent = `Camera error: ${error.message || 'Unable to access camera.'}`;
+                errorDiv.style.display = 'block';
+            }
+            this.updateCameraUI(false);
+            if (startBtn) {
+                startBtn.textContent = '🎥 Start Camera';
+            }
+        } finally {
+            if (startBtn) {
+                startBtn.disabled = false;
+            }
+        }
+    }
+
+    /**
+     * Stop camera stream
+     */
+    stopCamera() {
+        window.cameraManager.stopCamera();
+        this.updateCameraUI(false);
+    }
+
+    /**
+     * Update camera UI state
+     * @param {boolean} isActive
+     */
+    updateCameraUI(isActive) {
+        const video = document.getElementById('cameraVideo');
+        const placeholder = document.getElementById('cameraPlaceholder');
+        const controls = document.getElementById('cameraControls');
+        const stopBtn = document.getElementById('stopCameraBtn');
+        const startBtn = document.getElementById('startCameraBtn');
+
+        if (isActive && window.cameraManager.stream) {
+            if (video) {
+                video.style.display = 'block';
+            }
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
+            if (controls) {
+                controls.style.display = 'block';
+            }
+            if (stopBtn) {
+                stopBtn.style.display = 'inline-flex';
+            }
+            if (startBtn) {
+                startBtn.textContent = '🔄 Restart Camera';
+            }
+        } else {
+            if (video) {
+                video.style.display = 'none';
+            }
+            if (placeholder) {
+                placeholder.style.display = 'block';
+            }
+            if (controls) {
+                controls.style.display = 'none';
+            }
+            if (stopBtn) {
+                stopBtn.style.display = 'none';
+            }
+            if (startBtn) {
+                startBtn.textContent = '🎥 Start Camera';
+            }
+        }
+    }
+
+    /**
+     * Setup upload drag-and-drop interactions
+     */
+    setupUploadInteractions() {
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('backgroundInput');
+
+        if (!dropZone || !fileInput) return;
+
+        const preventDefaults = (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+        };
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (event) => {
+                preventDefaults(event);
+                dropZone.classList.add('is-dragover');
+            });
+        });
+
+        ['dragleave', 'dragend'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (event) => {
+                preventDefaults(event);
+                dropZone.classList.remove('is-dragover');
+            });
+        });
+
+        dropZone.addEventListener('drop', (event) => this.handleFileDrop(event));
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        fileInput.addEventListener('change', (event) => this.handleFileSelect(event));
+    }
+
+    /**
+     * Setup camera action buttons
+     */
+    setupCameraButtons() {
+        const startBtn = document.getElementById('startCameraBtn');
+        const stopBtn = document.getElementById('stopCameraBtn');
+
+        if (startBtn) {
+            startBtn.addEventListener('click', () => this.startCamera());
+        }
+
+        if (stopBtn) {
+            stopBtn.addEventListener('click', () => this.stopCamera());
         }
     }
 
@@ -369,7 +559,7 @@ class AppController {
      */
     handleVisibilityChange() {
         if (document.hidden && window.cameraManager.stream) {
-            window.cameraManager.stopCamera();
+            this.stopCamera();
         } else if (!document.hidden) {
             // When page becomes visible again, reload frame in case it was updated
             this.reloadFrameIfNeeded();
@@ -412,6 +602,9 @@ class AppController {
         window.addEventListener('unhandledrejection', (event) => {
             console.error('Unhandled promise rejection:', event.reason);
         });
+
+        this.setupUploadInteractions();
+        this.setupCameraButtons();
     }
 
     /**
