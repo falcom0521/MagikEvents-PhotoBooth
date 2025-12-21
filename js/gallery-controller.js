@@ -17,7 +17,7 @@ class GalleryController {
    */
   async initialize() {
     try {
-      console.log("Initializing Gallery Controller...");
+      console.log("Initializing Gallery Controller....");
 
       // Initialize Firebase service
       await window.firebaseService.initialize();
